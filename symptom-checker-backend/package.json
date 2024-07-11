@@ -1,0 +1,33 @@
+{
+  "name": "symptom-checker-backend",
+  "version": "1.0.0",
+  "description": "Application endpoint to access ICD API for symptoms diagnosis",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/prak112/Symptom-Checker-backend.git"
+  },
+  "keywords": [
+    "symptom",
+    "checker",
+    "diagnosis",
+    "triage",
+    "symptoms",
+    "assesment"
+  ],
+  "author": "Prakirth Govardhanam",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/prak112/Symptom-Checker-backend/issues"
+  },
+  "homepage": "https://github.com/prak112/Symptom-Checker-backend#readme",
+  "dependencies": {
+    "express": "^4.19.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.4"
+  }
+}
