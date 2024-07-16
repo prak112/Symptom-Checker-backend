@@ -4,6 +4,7 @@
   "description": "Application endpoint to access ICD API for symptoms diagnosis",
   "main": "index.js",
   "scripts": {
+    "dev": "node --env-file=.env index.js && node index.js",
     "test": "jest"
   },
   "repository": {
