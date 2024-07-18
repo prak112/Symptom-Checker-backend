@@ -1,71 +1,17 @@
-/** TODO
- * Build utility modules for -
-    * Request Endpoint setup
-**/
 // import utils
-const apiHelper = require('./utils/apiRequestBuilders')
+const requestHelper = require('./utils/requestBuilder')
 const searchHelper = require('./utils/lookupSearchData')
 
-// GET/POST - 'Specific' search result from symptoms list
-exports.getSpecificDiagnosis = async(request, response, next) => {
-    try {
-        // retrieve symptoms
-        const symptoms =  request.body.symptoms
-
-        // access middleware to authenticate access and setup scheduled token update
-        const requestOptions = apiHelper.buildRequestOptions();
-        // search API for symptom
-        const searchUrl = 'https://id.who.int/icd/release/11/2024-01/mms/autocode'
-
-        // Specific search result - /icd/release/11/2024-01/mms/autocode
-        const searchParams = {
-            searchText: symptoms,
-            matchThreshold: 0.75 
-        }
-        
-        // construct query string for URI
-        const searchEndpoint = apiHelper.buildRequestEndpoint(searchParams, searchUrl);
-        const searchResponse = await fetch(searchEndpoint, requestOptions)
-        console.log(`\nStatus ${requestOptions.method} ${searchUrl} :\n${searchResponse.status}`)
-
-        // Extract data and display in user-readable and understandable format
-        // extract data from search results
-        const searchData = await searchResponse.json()
-
-        // Specific search result - /icd/release/11/2024-01/mms/autocode
-        const searchDataOutput = {
-            searchedFor: searchData.searchText,
-            results: searchData.matchingText,
-            icdCode: searchData.theCode,
-            foundationURI: searchData.foundationURI,
-            relevancyScore: searchData.matchScore
-        };
-
-        console.log(`\nSearched for: ${searchDataOutput.searchedFor}
-        Results : ${searchDataOutput.results}
-        ICD code: ${searchDataOutput.icdCode}
-        Foundation URI: ${searchDataOutput.foundationURI}
-        Relevancy Score: ${searchDataOutput.relevancyScore}
-        \n`);
-
-        // lookup foundationURI
-        const diagnosisData = await searchHelper.generateDiagnosisData(requestOptions, searchDataOutput);
-        response.status(200).json(diagnosisData)
-    } 
-    catch(error) {
-        console.error('ERROR : ', error)
-        next(error)
-    }
-}
-
-// GET/POST - 'General' search result from symptoms list
+// POST - 'General' search result from symptoms list
 exports.getGeneralDiagnosis = async(request, response, next) => {
     try {
         // retrieve symptoms
         const symptoms =  request.body.symptoms
+        console.log('Symptoms Data: ', symptoms)
 
         // access middleware to authenticate access and setup scheduled token update
-        const requestOptions = apiHelper.buildRequestOptions();
+        const requestOptions = await requestHelper.buildRequestOptions(request, 'POST');
+        
         // search API for symptom
         const searchUrl = 'https://id.who.int/icd/release/11/2024-01/mms/search'
 
@@ -74,40 +20,49 @@ exports.getGeneralDiagnosis = async(request, response, next) => {
             q: symptoms,
             subtreeFilterUsesFoundationDescendants: false,
             includeKeywordResult: true,
-            useFlexiSearch: true,
+            useFlexisearch: true,
             flatResults: true,
             highlightingEnabled: true,
             medicalCodingMode: true 
         }
         
         // construct query string for URI
-        const searchEndpoint = apiHelper.buildRequestEndpoint(searchParams, searchUrl);
-        const searchResponse = await fetch(searchEndpoint, requestOptions)
+        const searchEndpoint = requestHelper.buildRequestEndpoint(searchParams, searchUrl);
+        const searchResponse = await fetch(searchEndpoint, requestOptions)  // ERROR - search request setup
+        console.log('Request Options : ', requestOptions)
         console.log(`\nStatus ${requestOptions.method} ${searchUrl} :\n${searchResponse.status}`)
 
         // extract data from search results
         const searchData = await searchResponse.json()
-        
+        console.log(searchData)
+
         // General search results - /icd/release/11/{releasId}/{linearizationName}/search
         // destinationEntities--> MatchingPVs--> label, score, foundationUri
         const labelsArray = []
         const scoresArray = []
         const foundationURIsArray = []
-
-        console.log(`\nSearched for: ${symptoms}`)
-        if('matchingPVs' in searchData){
-            for(pv of searchData.destinationEntities.matchingPVs){
-                if(pv){
-                    labelsArray.push(pv.label)
-                    scoresArray.push(pv.score)
-                    foundationURIsArray.push(pv.foundationUri)
-                    console.log(`Label: ${pv.label}\n
-                        Score: ${pv.score}\n
-                        FoundationURI: ${pv.foundationUri}\n
-                    `)
+        let limitResults = 3;
+        for(let entity of searchData.destinationEntities){
+            if(entity.matchingPVs && Array.isArray(entity.matchingPVs)){
+                for(let pv of entity.matchingPVs){
+                    if(limitResults > 0){
+                        console.log(`
+                            Label: ${pv.label}\nScore: ${pv.score}\nFoundationURI: ${pv.foundationUri}\n
+                        `);
+                        labelsArray.push(pv.label);
+                        scoresArray.push(pv.score);
+                        foundationURIsArray.push(pv.foundationUri);
+                        limitResults--;
+                    } else {
+                        break;
+                    }
                 }
             }
         }
+
+        console.log('LABELS:\n', labelsArray)
+        console.log('SCORES:\n', scoresArray)
+        console.log('URIs:\n', foundationURIsArray)
 
         const searchDataOutput = {
             label: labelsArray,
@@ -116,12 +71,65 @@ exports.getGeneralDiagnosis = async(request, response, next) => {
         }
 
         // lookup foundationURI
-        const diagnosisData = await searchHelper.generateDiagnosisData(requestOptions, searchDataOutput);
+        const lookUpRequestOptions = await requestHelper.buildRequestOptions(request, 'GET');
+        const diagnosisData = await searchHelper.generateDiagnosisData(lookUpRequestOptions, searchDataOutput);
         response.status(200).json(diagnosisData)
     } 
     catch(error) {
-        console.error('ERROR : ', error)
+        console.error('ERROR during General search : ', error)
         next(error)
     }
 }
+
+// POST - 'Specific' search result from symptoms list
+exports.getSpecificDiagnosis = async(request, response) => {
+    try {
+        // retrieve symptoms
+        const symptoms =  request.body.symptoms
+
+        // access middleware to authenticate access and setup scheduled token update
+        const requestOptions = await requestHelper.buildRequestOptions(request, 'GET');
+        // search API for symptom
+        const searchUrl = 'https://id.who.int/icd/release/11/2024-01/mms/autocode'
+
+        // Specific search result - /icd/release/11/2024-01/mms/autocode
+        const searchParams = {
+            searchText: symptoms
+        }
+        
+        // construct query string for URI
+        const searchEndpoint = requestHelper.buildRequestEndpoint(searchParams, searchUrl);
+        const searchResponse = await fetch(searchEndpoint, requestOptions)  // ERROR - 'specific' search
+        console.log(`\nStatus ${requestOptions.method} ${searchUrl} :\n${searchResponse.status}`)
+
+        // Extract data and display in user-readable and understandable format
+        // extract data from search results
+        const searchData = await searchResponse.json()
+
+        // Specific search result - /icd/release/11/2024-01/mms/autocode
+        //const foundationURIArray = []
+        const searchDataOutput = {
+            label: searchData.matchingText,
+            foundationURI: searchData.foundationURI,
+            score: searchData.matchScore
+        };
+
+        console.log(`\nSearched for: ${searchData.searchText}
+        Results : ${searchDataOutput.label}
+        ICD code: ${searchData.theCode}
+        Foundation URI: ${searchDataOutput.foundationURI}
+        Relevancy Score: ${searchDataOutput.score}
+        \n`);
+
+        // lookup foundationURI
+        const lookUpRequestOptions = await requestHelper.buildRequestOptions(request, 'GET');
+        const diagnosisData = await searchHelper.generateDiagnosisData(lookUpRequestOptions, searchDataOutput);
+        response.status(200).json(diagnosisData)
+    } 
+    catch(error) {
+        console.error('ERROR during Specific search : ', error)
+    }
+}
+
+
 
