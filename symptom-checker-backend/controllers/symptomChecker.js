@@ -2,12 +2,16 @@
 const requestHelper = require('./utils/requestBuilder')
 const searchHelper = require('./utils/lookupSearchData')
 
+// intialize arrays for diagnosis data
+let labelsArray = []
+let scoresArray = []
+let foundationURIsArray = []
+
 // POST - 'General' search result from symptoms list
 exports.getGeneralDiagnosis = async(request, response, next) => {
     try {
         // retrieve symptoms
         const symptoms =  request.body.symptoms
-        console.log('Symptoms Data: ', symptoms)
 
         // access middleware to authenticate access and setup scheduled token update
         const requestOptions = await requestHelper.buildRequestOptions(request, 'POST');
@@ -28,20 +32,16 @@ exports.getGeneralDiagnosis = async(request, response, next) => {
         
         // construct query string for URI
         const searchEndpoint = requestHelper.buildRequestEndpoint(searchParams, searchUrl);
-        const searchResponse = await fetch(searchEndpoint, requestOptions)  // ERROR - search request setup
+        const searchResponse = await fetch(searchEndpoint, requestOptions)
         console.log('Request Options : ', requestOptions)
         console.log(`\nStatus ${requestOptions.method} ${searchUrl} :\n${searchResponse.status}`)
 
         // extract data from search results
         const searchData = await searchResponse.json()
-        console.log(searchData)
 
         // General search results - /icd/release/11/{releasId}/{linearizationName}/search
-        // destinationEntities--> MatchingPVs--> label, score, foundationUri
-        const labelsArray = []
-        const scoresArray = []
-        const foundationURIsArray = []
-        let limitResults = 3;
+        // Data crawl map : destinationEntities--> MatchingPVs--> label, score, foundationUri
+        let limitResults = 6;
         for(let entity of searchData.destinationEntities){
             if(entity.matchingPVs && Array.isArray(entity.matchingPVs)){
                 for(let pv of entity.matchingPVs){
@@ -81,6 +81,13 @@ exports.getGeneralDiagnosis = async(request, response, next) => {
     }
 }
 
+// TO DO: 
+/**
+ * plan pagination of 'General' search results
+ * basic tests for API setup, controllers functionality
+ * Debug diagnosis results repetition 
+**/
+
 // POST - 'Specific' search result from symptoms list
 exports.getSpecificDiagnosis = async(request, response) => {
     try {
@@ -99,19 +106,23 @@ exports.getSpecificDiagnosis = async(request, response) => {
         
         // construct query string for URI
         const searchEndpoint = requestHelper.buildRequestEndpoint(searchParams, searchUrl);
-        const searchResponse = await fetch(searchEndpoint, requestOptions)  // ERROR - 'specific' search
+        const searchResponse = await fetch(searchEndpoint, requestOptions) 
         console.log(`\nStatus ${requestOptions.method} ${searchUrl} :\n${searchResponse.status}`)
 
         // Extract data and display in user-readable and understandable format
         // extract data from search results
         const searchData = await searchResponse.json()
+        console.log('Auto Search Data : \n', searchData)
 
         // Specific search result - /icd/release/11/2024-01/mms/autocode
-        //const foundationURIArray = []
+        labelsArray.push(searchData.matchingText)
+        foundationURIsArray.push(searchData.foundationURI)
+        scoresArray.push(searchData.matchScore)
+
         const searchDataOutput = {
-            label: searchData.matchingText,
-            foundationURI: searchData.foundationURI,
-            score: searchData.matchScore
+            label: labelsArray,
+            foundationURI: foundationURIsArray,
+            score: scoresArray
         };
 
         console.log(`\nSearched for: ${searchData.searchText}
