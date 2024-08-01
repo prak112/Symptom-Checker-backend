@@ -26,8 +26,10 @@
   },
   "homepage": "https://github.com/prak112/Symptom-Checker-backend#readme",
   "dependencies": {
+    "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
     "express": "^4.19.2",
+    "mongoose": "^8.5.2",
     "morgan": "^1.10.0"
   },
   "devDependencies": {
