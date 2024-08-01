@@ -1,6 +1,6 @@
 const express = require('express')
 const router = express.Router()
-const symptomCheckerController = require('../controllers/symptomChecker')
+const symptomCheckerController = require('../controllers/symptomChecker/symptomChecker')
 
 // 'General' search result
 router.post('/general', symptomCheckerController.getGeneralDiagnosis)
