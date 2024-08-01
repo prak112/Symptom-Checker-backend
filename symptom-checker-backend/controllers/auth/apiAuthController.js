@@ -1,7 +1,7 @@
 // imports
-const logger = require('../utils/logger')
-const config = require('../utils/config')
-const apiAuthenticator = require('../utils/apiAuthenticator')
+const logger = require('../../utils/logger')
+const config = require('../../utils/config')
+const apiAuthenticator = require('../../utils/apiAuthenticator')
 
 // Setup ICD API access
 // ICD API authentication to OAUTH 2.0 Token Endpoint (token from API for access)

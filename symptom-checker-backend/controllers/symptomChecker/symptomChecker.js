@@ -1,6 +1,6 @@
 // import utils
-const requestHelper = require('./utils/requestBuilder')
-const searchHelper = require('./utils/lookupSearchData')
+const requestHelper = require('../utils/requestBuilder')
+const searchHelper = require('../utils/lookupSearchData')
 
 // intialize arrays for diagnosis data
 let labelsArray = []
