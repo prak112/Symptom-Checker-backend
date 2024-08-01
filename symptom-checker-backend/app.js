@@ -12,16 +12,19 @@
     * other possible conditions list - 'exclusion', 'indexTerm'
 **/
 
-// intial setup
+// Intial setup
+const config = require('./utils/config')
 const express = require('express')
 const app = express()
+const cookieParser = require('cookie-parser')
+app.use(cookieParser())
 const cors = require('cors')  // cross-origin resource sharing
-const config = require('./utils/config')
 const middleware = require('./utils/middleware')
 const logger = require('./utils/logger')
-const apiAuthController = require('./controllers/apiAuthController')
+const apiAuthController = require('./controllers/auth/apiAuthController')
+const signupRouter = require('./controllers/auth/signup')
+const loginRouter = require('./controllers/auth/login')
 const symptomCheckerRouter = require('./routes/symptomCheckerRouter')
-const signupRouter = require('./controllers/signup')
 
 
 // Setup MongoDB connection
@@ -52,8 +55,16 @@ app.use(middleware.requestLogger)
 
 
 // Route requests
+/**TO DO
+ * setup login controller and route
+ * setup symptom input data encryption with user passwordHash as key for storage after ICD API access
+ */
+app.use('/public/login', loginRouter)
 app.use('/public/signup', signupRouter)
 app.use('/api/protected/symptoms', symptomCheckerRouter)
+
+app.use(middleware.tokenExtractor)
+app.use(middleware.userExtractor)
 
 // Error handlers
 app.use(middleware.unknownEndpoint)
