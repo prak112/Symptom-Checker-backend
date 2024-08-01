@@ -1,0 +1,10 @@
+####
+#@valid login
+
+POST http://localhost:3003/public/signup HTTP/1.1
+content-type: application/json
+
+{
+    "username": "tester deus",
+    "password": "F/ippAtyF7a€"
+}
