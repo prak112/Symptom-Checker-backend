@@ -1,6 +1,6 @@
 ####
-#@valid signup 1
-POST http://localhost:3003/public/signup HTTP/1.1
+#@valid login 1
+POST http://localhost:3003/public/login HTTP/1.1
 content-type: application/json
 
 {
@@ -9,9 +9,9 @@ content-type: application/json
 }
 
 ####
-#@valid signup 2
+#@valid login 2
 
-POST http://localhost:3003/public/signup HTTP/1.1
+POST http://localhost:3003/public/login HTTP/1.1
 content-type: application/json
 
 {
@@ -20,9 +20,9 @@ content-type: application/json
 }
 
 ####
-#@invalid signup 1
+#@invalid login
 
-POST http://localhost:3003/public/signup HTTP/1.1
+POST http://localhost:3003/public/login HTTP/1.1
 content-type: application/json
 
 {
