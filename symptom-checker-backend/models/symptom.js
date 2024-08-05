@@ -6,6 +6,10 @@ const symptomSchema = new mongoose.Schema({
         required: true,
         minLength: 5
     },
+    diagnosis: {
+        type: String,
+        required: true
+    },
     user:{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User'
