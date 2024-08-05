@@ -1,6 +1,6 @@
-const { response } = require('../app')
 const logger = require('./logger')
 const config = require('./config')
+const crypto = require('crypto') // session ID generation
 const User = require('../models/user')
 
 // load Middleware (VERY PARTICULAR ORDER)
@@ -11,6 +11,8 @@ const requestLogger = morgan('dev')
 // morgan.token('body', (req, res) => JSON.stringify(req.body) );
 // app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'));
 
+// generate secret variables for .env or session_id
+const secretGenerator = () => crypto.randomBytes(16).toString('hex')
 
 // assign JWT from request headers to request parameters
 const tokenExtractor = (request, response, next) => {
@@ -65,4 +67,10 @@ const errorHandler = (error, request, response, next) => {
 }
 
 // export to app
-module.exports = { requestLogger, tokenExtractor, userExtractor, unknownEndpoint, errorHandler }
+module.exports = { 
+    requestLogger, 
+    secretGenerator,
+    tokenExtractor, 
+    userExtractor, 
+    unknownEndpoint, 
+    errorHandler }
