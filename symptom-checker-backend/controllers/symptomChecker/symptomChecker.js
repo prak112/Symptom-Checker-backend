@@ -2,14 +2,15 @@
 const requestHelper = require('../utils/requestBuilder')
 const searchHelper = require('../utils/lookupSearchData')
 
-// intialize arrays for diagnosis data
-let labelsArray = []
-let scoresArray = []
-let foundationURIsArray = []
 
 // POST - 'General' search result from symptoms list
 exports.getGeneralDiagnosis = async(request, response, next) => {
     try {
+        // intialize arrays for diagnosis data
+        let labelsArray = []
+        let scoresArray = []
+        let foundationURIsArray = []
+
         // retrieve symptoms
         const symptoms =  request.body.symptoms
 
@@ -33,8 +34,8 @@ exports.getGeneralDiagnosis = async(request, response, next) => {
         // construct query string for URI
         const searchEndpoint = requestHelper.buildRequestEndpoint(searchParams, searchUrl);
         const searchResponse = await fetch(searchEndpoint, requestOptions)
-        console.log('Request Options : ', requestOptions)
-        console.log(`\nStatus ${requestOptions.method} ${searchUrl} :\n${searchResponse.status}`)
+        // console.log('Request Options : ', requestOptions)
+        console.log(`\nStatus ${requestOptions.method} ${searchUrl} : ${searchResponse.status}`)
 
         // extract data from search results
         const searchData = await searchResponse.json()
@@ -46,9 +47,9 @@ exports.getGeneralDiagnosis = async(request, response, next) => {
             if(entity.matchingPVs && Array.isArray(entity.matchingPVs)){
                 for(let pv of entity.matchingPVs){
                     if(limitResults > 0){
-                        console.log(`
-                            Label: ${pv.label}\nScore: ${pv.score}\nFoundationURI: ${pv.foundationUri}\n
-                        `);
+                        // console.log(`
+                        //     Label: ${pv.label}\nScore: ${pv.score}\nFoundationURI: ${pv.foundationUri}\n
+                        // `);
                         labelsArray.push(pv.label);
                         scoresArray.push(pv.score);
                         foundationURIsArray.push(pv.foundationUri);
@@ -60,10 +61,10 @@ exports.getGeneralDiagnosis = async(request, response, next) => {
             }
         }
 
-        console.log('LABELS:\n', labelsArray)
-        console.log('SCORES:\n', scoresArray)
-        console.log('URIs:\n', foundationURIsArray)
-
+        console.log('LABELS: ', labelsArray.length)
+        console.log('SCORES: ', scoresArray.length)
+        console.log('URIs: ', foundationURIsArray.length)
+    
         const searchDataOutput = {
             label: labelsArray,
             score: scoresArray,
@@ -91,6 +92,11 @@ exports.getGeneralDiagnosis = async(request, response, next) => {
 // POST - 'Specific' search result from symptoms list
 exports.getSpecificDiagnosis = async(request, response) => {
     try {
+        // intialize arrays for diagnosis data
+        let labelsArray = []
+        let scoresArray = []
+        let foundationURIsArray = []
+
         // retrieve symptoms
         const symptoms =  request.body.symptoms
 
@@ -107,12 +113,12 @@ exports.getSpecificDiagnosis = async(request, response) => {
         // construct query string for URI
         const searchEndpoint = requestHelper.buildRequestEndpoint(searchParams, searchUrl);
         const searchResponse = await fetch(searchEndpoint, requestOptions) 
-        console.log(`\nStatus ${requestOptions.method} ${searchUrl} :\n${searchResponse.status}`)
+        console.log(`\nStatus ${requestOptions.method} ${searchUrl} : ${searchResponse.status}`)
 
         // Extract data and display in user-readable and understandable format
         // extract data from search results
         const searchData = await searchResponse.json()
-        console.log('Auto Search Data : \n', searchData)
+        // console.log('Auto Search Data : \n', searchData)
 
         // Specific search result - /icd/release/11/2024-01/mms/autocode
         labelsArray.push(searchData.matchingText)
@@ -125,12 +131,12 @@ exports.getSpecificDiagnosis = async(request, response) => {
             score: scoresArray
         };
 
-        console.log(`\nSearched for: ${searchData.searchText}
-        Results : ${searchDataOutput.label}
-        ICD code: ${searchData.theCode}
-        Foundation URI: ${searchDataOutput.foundationURI}
-        Relevancy Score: ${searchDataOutput.score}
-        \n`);
+        // console.log(`\nSearched for: ${searchData.searchText}
+        // Results : ${searchDataOutput.label}
+        // ICD code: ${searchData.theCode}
+        // Foundation URI: ${searchDataOutput.foundationURI}
+        // Relevancy Score: ${searchDataOutput.score}
+        // \n`);
 
         // lookup foundationURI
         const lookUpRequestOptions = await requestHelper.buildRequestOptions(request, 'GET');
