@@ -27,7 +27,7 @@ try {
 
 function fetchToken(tokenData) {
     try {        
-        console.log('Data from fetchToken: ', tokenData)
+        console.log('Token type: ', tokenData.token_type)
         tokenInfo.accessToken = tokenData.access_token
         tokenInfo.expiresIn = tokenData.expires_in  // 3600 seconds
         

@@ -22,10 +22,10 @@ async function generateDiagnosisData(requestOptions, searchDataOutput) {
          ? detailsArray.push(lookupData.definition["@value"])
          : detailsArray.push('No additional information')
         
-         console.log(`\nVisit ICD WHO website for more info : ${browserUrlsArray}
-            Diagnosed condition : ${titlesArray}
-            General details : ${detailsArray}
-        \n`);
+        //  console.log(`\nVisit ICD WHO website for more info : ${browserUrlsArray}
+        //     Diagnosed condition : ${titlesArray}
+        //     General details : ${detailsArray}
+        // \n`);
     }
 
     // pack searchDataOutput and LookUp API query data variables
