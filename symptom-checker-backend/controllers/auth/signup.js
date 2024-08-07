@@ -1,16 +1,18 @@
-const signupRouter = require('express').Router()
+//const signupRouter = require('express').Router()
 const bcrypt = require('bcryptjs')
 const User = require('../../models/user')
 
-signupRouter.post('/', async(request, response, next) => {
-    const { username, password } = request.body
-
-    // validate password
-    const specialChars = /[\W_]/
-    if(!password || password.length < 6 || !specialChars.test(password)){
-        throw new Error('ValidationError: Password must be greater than 6 characters. Must include special characters')
-    }
+exports.registerUser = async(request, response, next) => {
     try{
+        const { username, password } = request.body
+        console.log('Username: ', username)
+
+        // validate password
+        const specialChars = /[\W_]/
+        if(!password || password.length < 6 || !specialChars.test(password)){
+            throw new Error('ValidationError: Password must be greater than 6 characters. Must include special characters')
+        }
+
         const saltRounds = 10
         const passwordHash = await bcrypt.hash(password, saltRounds)
         const userToRegister = new User({
@@ -21,8 +23,7 @@ signupRouter.post('/', async(request, response, next) => {
         response.status(201).json(savedUser)
     }
     catch(error){
+        console.error('Error during registration: ', error)
         next(error)
     }
-})
-
-module.exports = signupRouter
+}
