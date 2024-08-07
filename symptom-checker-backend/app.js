@@ -8,8 +8,7 @@ const cors = require('cors')  // cross-origin resource sharing
 const middleware = require('./utils/middleware')
 const logger = require('./utils/logger')
 const apiAuthController = require('./controllers/auth/apiAuthController')
-const signupRouter = require('./controllers/auth/signup')
-const loginRouter = require('./controllers/auth/login')
+const userAuthRouter = require('./routes/userAuthRouter')
 const symptomCheckerRouter = require('./routes/symptomCheckerRouter')
 
 
@@ -42,11 +41,13 @@ app.use(middleware.requestLogger)
 
 // Route requests
 /**TO DO
- * setup login controller and route
- * setup symptom input data encryption with user passwordHash as key for storage after ICD API access
- */
-app.use('/public/login', loginRouter)
-app.use('/public/signup', signupRouter)
+ * DEBUG-Token renewal schedule (1hour) not working
+ * FEAT-encrypt symptom data, user data with local DB_SECRET key for storage
+ * FEAT-Refine search results : to address all symptoms, to remove < 0 score results
+ * TEST-Unit tests for user auth, api auth, symptomChecker requests
+**/
+
+app.use('/public/auth', userAuthRouter)
 app.use('/api/protected/symptoms', symptomCheckerRouter)
 
 app.use(middleware.tokenExtractor)
