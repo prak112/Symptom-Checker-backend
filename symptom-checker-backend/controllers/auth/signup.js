@@ -5,7 +5,7 @@ const User = require('../../models/user')
 exports.registerUser = async(request, response, next) => {
     try{
         const { username, password } = request.body
-        console.log('Username: ', username)
+        console.log('\nUsername to register: ', username)
 
         // validate password
         const specialChars = /[\W_]/

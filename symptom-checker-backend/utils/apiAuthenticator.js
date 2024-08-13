@@ -32,7 +32,7 @@ function fetchToken(tokenData) {
         tokenInfo.expiresIn = tokenData.expires_in  // 3600 seconds
         
         // schedule token update
-        // expires_in data available, reset updateTimeout callback
+        // reset updateTimeout callback
         if(tokenInfo.updateTimeout){
             clearInterval(tokenInfo.updateTimeout)
             console.log('Clear Token update callback')
