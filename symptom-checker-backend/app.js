@@ -24,8 +24,16 @@ mongoose
     })
 
 
-// Load Middleware
+/**TO DO
+ * DEBUG-Diagnosis : Long texts in 'Detail' column are converted to NaN - try lazy loading
+ * DEBUG-Token renewal schedule (1hour) not working
+ * FEAT-encrypt symptom data, user data with local DB_SECRET key for storage
+ * FEAT-Refine search results : to address all symptoms, to remove < 0 score results
+ * TEST-Unit tests for user auth, api auth, symptomChecker requests
+**/
 
+
+// Load Middleware
 // ICD API authentication middeware
 app.use(apiAuthController.authenticate)
 
@@ -38,15 +46,7 @@ app.use(cors({
 app.use(express.json()) 
 app.use(middleware.requestLogger)
 
-
 // Route requests
-/**TO DO
- * DEBUG-Token renewal schedule (1hour) not working
- * FEAT-encrypt symptom data, user data with local DB_SECRET key for storage
- * FEAT-Refine search results : to address all symptoms, to remove < 0 score results
- * TEST-Unit tests for user auth, api auth, symptomChecker requests
-**/
-
 app.use('/public/auth', userAuthRouter)
 app.use('/api/protected/symptoms', symptomCheckerRouter)
 
