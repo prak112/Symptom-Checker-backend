@@ -3,18 +3,23 @@ const bcrypt = require('bcryptjs')
 const config = require('../../utils/config')
 const User = require('../../models/user')
 
-exports.authenticateUser = async(request, response, next) => {
+exports.authenticateUser = async(request, response) => {
     try {
         const { username, password } = request.body
         const registeredUser = await User.findOne({username: username})
         if(!registeredUser){
-            throw new Error('User does not exist. Signup for access.')
+            console.error('User does not exist. Signup for access.')
+            return response
+                .status(401)
+                .json({ error: 'User does not exist. Signup for access.' })
         }
         const isPassword = password === null 
             ? false
             : bcrypt.compare(password, registeredUser.passwordHash)
         if(!isPassword){
-            throw new Error('Invalid Password. Verify credentials before entering.')
+            return response
+                .status(401)
+                .json({ error: 'Invalid Credentials. Check and enter again.' })
         }
     
         // if valid username and password
@@ -44,6 +49,8 @@ exports.authenticateUser = async(request, response, next) => {
     } 
     catch (error){
         console.error('Error during Login: ', error)
-        next(error)
+        return response
+            .status(500)
+            .json({ error: 'Internal Server Error.' })
     }
 }
