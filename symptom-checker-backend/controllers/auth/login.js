@@ -13,9 +13,7 @@ exports.authenticateUser = async(request, response) => {
                 .status(401)
                 .json({ error: 'User does not exist. Signup for access.' })
         }
-        const isPassword = password === null 
-            ? false
-            : bcrypt.compare(password, registeredUser.passwordHash)
+        const isPassword = await bcrypt.compare(password, registeredUser.passwordHash)        
         if(!isPassword){
             return response
                 .status(401)
