@@ -1,9 +1,27 @@
-# End-to-End Encryption
+# Features :
+- [Grouped Search Results](#grouped-search-results)
+- [End-to-End Encryption](#end-to-end-encryption)
+- [Geolocation APIs](#geolocation-apis)
+- [Triage System](#triage-system)
+- [Intelligent I/O Simplification](#intelligent-io-simplification)
+
+<hr>
+<hr>
+<br>
+
+## Grouped Search Results
+- GitHub Issue [#3](https://github.com/prak112/Symptom-Checker-backend/issues/3)
+
+<hr>
+<br>
+
+## End-to-End Encryption
+- GitHub Issue [#4](https://github.com/prak112/Symptom-Checker-backend/issues/4)
 - To provide users the option to use the services as a registered user/guest user, the user input data needs to be encrypted and decrypted at request/to provide service.
 - **Session IDs** provide the possibility to act as an encryption key to securely store the encrypted user input data (in this case, Symptoms)
 
 
-## Session ID to encrypt user input
+### Session ID to encrypt user input
 1. *Create Middleware to Generate Session ID*: 
     - When a user accesses the service, generate a unique session ID.
     - Import the middleware to generate a session ID and attach it to the request object.
@@ -21,7 +39,7 @@
     - When the user needs to access the data, use the session ID to decrypt it.
 
 
-## Encrypt Session ID for secure storage
+### Encrypt Session ID for secure storage
 - *Setup DB_SECRET in .env*:
     - Define the DB_SECRET in .env file or environment configuration.
 - *Encrypt Data*:
@@ -44,3 +62,21 @@
 
 4. *Deploy the Changes*:
     - Deploy the updated environment configuration to all environments (development, staging, production)
+
+<hr>
+<br>
+
+## Geolocation APIs
+- GitHub Issue [#5](https://github.com/prak112/Symptom-Checker-backend/issues/5)
+
+<hr>
+<br>
+
+## Triage System
+- GitHub Issue [#6](https://github.com/prak112/Symptom-Checker-backend/issues/6)
+
+<hr>
+<br>
+
+## Intelligent I/O Simplification
+- GitHub Issue [#7](https://github.com/prak112/Symptom-Checker-backend/issues/7)
