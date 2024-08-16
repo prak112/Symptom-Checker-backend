@@ -1,7 +1,7 @@
 // import utils
 const requestHelper = require('../utils/requestBuilder')
 const searchHelper = require('../utils/lookupSearchData')
-
+// Setup MongoDB collection and data storage
 
 // POST - 'General' search result from symptoms list
 exports.getGeneralDiagnosis = async(request, response, next) => {
@@ -42,21 +42,18 @@ exports.getGeneralDiagnosis = async(request, response, next) => {
 
         // General search results - /icd/release/11/{releasId}/{linearizationName}/search
         // Data crawl map : destinationEntities--> MatchingPVs--> label, score, foundationUri
-        let limitResults = 6;
+        let limitResults;
         for(let entity of searchData.destinationEntities){
             if(entity.matchingPVs && Array.isArray(entity.matchingPVs)){
                 for(let pv of entity.matchingPVs){
-                    if(limitResults > 0){
-                        // console.log(`
-                        //     Label: ${pv.label}\nScore: ${pv.score}\nFoundationURI: ${pv.foundationUri}\n
-                        // `);
+                    // if(limitResults > 0){
                         labelsArray.push(pv.label);
                         scoresArray.push(pv.score);
                         foundationURIsArray.push(pv.foundationUri);
-                        limitResults--;
-                    } else {
-                        break;
-                    }
+                        limitResults++;
+                    // } else {
+                    //     break;
+                    // }
                 }
             }
         }
@@ -81,13 +78,6 @@ exports.getGeneralDiagnosis = async(request, response, next) => {
         next(error)
     }
 }
-
-// TO DO: 
-/**
- * plan pagination of 'General' search results
- * basic tests for API setup, controllers functionality
- * Debug diagnosis results repetition 
-**/
 
 // POST - 'Specific' search result from symptoms list
 exports.getSpecificDiagnosis = async(request, response) => {
