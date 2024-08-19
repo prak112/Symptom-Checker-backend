@@ -3,17 +3,32 @@ const requestHelper = require('../utils/requestBuilder')
 const searchHelper = require('../utils/lookupSearchData')
 // Setup MongoDB collection and data storage
 
+/* REFACTOR diagnosisData
+ERRORS:
+======
+- NaN% in 'detail' : 
+	- If 'detail' has text WITH numbers React represents it as 'NaN%'
+
+
+TO DOs:
+=======
+- ISSUE: If 'url' has 'NA', omit record
+- ISSUE: IF 'url' has 'https://.../.../mms/other' leads to empty ICD home page
+- FEATURE: Show pain location in 2D-body image 
+*/
+
 // POST - 'General' search result from symptoms list
 exports.getGeneralDiagnosis = async(request, response, next) => {
     try {
         // intialize arrays for diagnosis data
         let labelsArray = []
         let scoresArray = []
-        let foundationURIsArray = []
+        let foundationUrisArray = []
 
         // retrieve symptoms
         const symptoms =  request.body.symptoms
-
+        console.log('\nRequest SEARCH API call for : ', symptoms);
+        
         // access middleware to authenticate access and setup scheduled token update
         const requestOptions = await requestHelper.buildRequestOptions(request, 'POST');
         
@@ -35,37 +50,33 @@ exports.getGeneralDiagnosis = async(request, response, next) => {
         const searchEndpoint = requestHelper.buildRequestEndpoint(searchParams, searchUrl);
         const searchResponse = await fetch(searchEndpoint, requestOptions)
         // console.log('Request Options : ', requestOptions)
-        console.log(`\nStatus ${requestOptions.method} ${searchUrl} : ${searchResponse.status}`)
+        console.log(`\nSEARCH ${requestOptions.method} ${searchUrl} : ${searchResponse.status}`)
 
         // extract data from search results
         const searchData = await searchResponse.json()
 
         // General search results - /icd/release/11/{releasId}/{linearizationName}/search
         // Data crawl map : destinationEntities--> MatchingPVs--> label, score, foundationUri
-        let limitResults;
-        for(let entity of searchData.destinationEntities){
-            if(entity.matchingPVs && Array.isArray(entity.matchingPVs)){
-                for(let pv of entity.matchingPVs){
-                    // if(limitResults > 0){
+        for(let entity of searchData.destinationEntities) {
+            if(entity.matchingPVs && Array.isArray(entity.matchingPVs)) {
+                for(let pv of entity.matchingPVs) {
+                    // avoid duplicate data in searchDataOutput
+                    if(foundationUrisArray.includes(pv.foundationUri)) {
+                        break
+                    }
+                    else {
                         labelsArray.push(pv.label);
                         scoresArray.push(pv.score);
-                        foundationURIsArray.push(pv.foundationUri);
-                        limitResults++;
-                    // } else {
-                    //     break;
-                    // }
+                        foundationUrisArray.push(pv.foundationUri);
+                    }
                 }
             }
         }
-
-        console.log('LABELS: ', labelsArray.length)
-        console.log('SCORES: ', scoresArray.length)
-        console.log('URIs: ', foundationURIsArray.length)
     
         const searchDataOutput = {
             label: labelsArray,
             score: scoresArray,
-            foundationURI: foundationURIsArray
+            foundationURI: foundationUrisArray,
         }
 
         // lookup foundationURI
@@ -85,7 +96,7 @@ exports.getSpecificDiagnosis = async(request, response) => {
         // intialize arrays for diagnosis data
         let labelsArray = []
         let scoresArray = []
-        let foundationURIsArray = []
+        let foundationUrisArray = []
 
         // retrieve symptoms
         const symptoms =  request.body.symptoms
@@ -112,12 +123,12 @@ exports.getSpecificDiagnosis = async(request, response) => {
 
         // Specific search result - /icd/release/11/2024-01/mms/autocode
         labelsArray.push(searchData.matchingText)
-        foundationURIsArray.push(searchData.foundationURI)
+        foundationUrisArray.push(searchData.foundationURI)
         scoresArray.push(searchData.matchScore)
 
         const searchDataOutput = {
             label: labelsArray,
-            foundationURI: foundationURIsArray,
+            foundationURI: foundationUrisArray,
             score: scoresArray
         };
 
