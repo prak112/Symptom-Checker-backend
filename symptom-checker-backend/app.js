@@ -13,8 +13,6 @@ const symptomCheckerRouter = require('./routes/symptomCheckerRouter')
 
 
 /**TO DO
- * DEBUG-Token renewal schedule (1hour) not working
- * DEBUG-Diagnosis : Long texts in 'Detail' column are converted to NaN - try lazy loading
  * FEAT-User Auth : Setup 'Login as Guest' or store guest users' input as 'guest#random-number'
  * FEAT-Symptoms : Setup MongoDB collection and data storage
  * FEAT-encrypt symptom data, user data with local DB_SECRET key for storage
