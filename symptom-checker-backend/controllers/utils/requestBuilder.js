@@ -1,5 +1,5 @@
 async function buildRequestOptions(request, requestType) {
-    console.log('Fetching token...');
+    console.log('Building request and calling API...');
     const token = await request.accessToken
     // console.log('Token: ', token);
     const requestOptions = {
