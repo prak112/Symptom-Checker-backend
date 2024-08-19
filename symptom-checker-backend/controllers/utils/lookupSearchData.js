@@ -1,8 +1,21 @@
 const requestHelper = require('./requestBuilder')
 
+/** REFACTOR diagnosisData
+ * Recieve all results, no limitations - DONE
+ * Collect highest Score with -'label,'title/detail','url' as 'topResult'
+ * Collect negative Score as 'excludedResults' and positive Score as 'includedResults' 
+ * Repeat the following procedure for both Result Sets :
+    * Filter out duplicate Url(browserUrls) - DONE(in searchDataOutput)
+    * Package data by each user-provided symptom
+    * For each user-provided symptom :
+        * Filter 'topResult' by Score (for highlighted rendering) with Label, Detail, Score and Url
+        * Sort results by Score in descending order and tag related Label (for <Chip/> rendering with Label and Score)
+        * Omit Title and Detail for results, except 'topResult'
+**/
+
 async function generateDiagnosisData(requestOptions, searchDataOutput) {
     // initialize diagnosis data
-    const browserUrlsArray = [];
+    const urlsArray = [];
     const titlesArray = [];
     const detailsArray = [];
     // lookup each foundationUri from searchDataOutput
@@ -14,19 +27,57 @@ async function generateDiagnosisData(requestOptions, searchDataOutput) {
         const lookupEndpoint = requestHelper.buildRequestEndpoint(lookupParams, lookupUrl);
         const lookupResponse = await fetch(lookupEndpoint, requestOptions);
         const lookupData = await lookupResponse.json();
-    
-        // extract 'browserUrl','title','definition'
-        browserUrlsArray.push(lookupData.browserUrl);
-        titlesArray.push(lookupData.title["@value"]);
+
+        // validate and update arrays for 'browserUrl','title','definition'
+        lookupData.browserUrl.includes('unspecified')|| lookupData.browserUrl.includes('other') 
+            ? urlsArray.push('NA')
+            : urlsArray.push(lookupData.browserUrl)
+        lookupData.title["@value"].includes('unspecified')
+            ? titlesArray.push('NA')
+            : titlesArray.push(lookupData.title["@value"])
         lookupData.definition
-         ? detailsArray.push(lookupData.definition["@value"])
-         : detailsArray.push('No additional information')
-        
-        //   console.log(`\nVisit ICD WHO website for more info : ${browserUrlsArray}`);
-        //     Diagnosed condition : ${titlesArray}
-        //     General details : ${detailsArray}
-        // \n`);
+            ? detailsArray.push(lookupData.definition["@value"].toString())
+            : detailsArray.push('NA')
     }
+
+    // filter for duplicates - 
+    // title, url, searchDataOutput.label, searchDataOutput.score
+    console.log(`\nLOOKUP data AFTER filtering for duplicates :
+    LABELS: ${searchDataOutput.label.length}
+    SCORES: ${searchDataOutput.score.length}
+    URLS : ${urlsArray.length}
+    TITLES : ${titlesArray.length}
+    DETAILS : ${detailsArray.length}    
+    `)
+    
+
+    // // sort by descending 'score'
+
+
+    // // split processed data
+    // const topResult = {
+    //     label: searchDataOutput.label,
+    //     score: searchDataOutput.score,        
+    //     title: titlesArray,
+    //     detail: detailsArray,
+    //     url: urlsArray,
+    // }
+    // const includedResults = {
+    //     label: searchDataOutput.label,
+    //     score: searchDataOutput.score,        
+    //     url: urlsArray,
+    // }
+    // const excludedResults = {
+    //     label: searchDataOutput.label,
+    //     score: searchDataOutput.score,        
+    //     url: urlsArray,
+    // }
+    // // pack `topResult`, `includedResults`, `excludedResults` into diagnosisData
+    // const diagnosisData = {
+    //     topResult: topResult,
+    //     includedResults: includedResults,
+    //     excludedResults: excludedResults,
+    // }
 
     // pack searchDataOutput and LookUp API query data variables
     const diagnosisData = {
@@ -34,8 +85,8 @@ async function generateDiagnosisData(requestOptions, searchDataOutput) {
         score: searchDataOutput.score,        
         title: titlesArray,
         detail: detailsArray,
-        url: browserUrlsArray,
-    };
+        url: urlsArray,
+    };    
     return diagnosisData;
 }
 
