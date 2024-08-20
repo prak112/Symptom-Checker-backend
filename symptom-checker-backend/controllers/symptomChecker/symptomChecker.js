@@ -7,13 +7,10 @@ const searchHelper = require('../utils/lookupSearchData')
 ERRORS:
 ======
 - NaN% in 'detail' : 
-	- If 'detail' has text WITH numbers React represents it as 'NaN%'
-
+	- *Assumption* If 'detail' has text WITH numbers React represents it as 'NaN%'
 
 TO DOs:
 =======
-- ISSUE: If 'url' has 'NA', omit record
-- ISSUE: IF 'url' has 'https://.../.../mms/other' leads to empty ICD home page
 - FEATURE: Show pain location in 2D-body image 
 */
 
@@ -27,7 +24,7 @@ exports.getGeneralDiagnosis = async(request, response, next) => {
 
         // retrieve symptoms
         const symptoms =  request.body.symptoms
-        console.log('\nRequest SEARCH API call for : ', symptoms);
+        console.log('\nSEARCH Query for : ', symptoms);
         
         // access middleware to authenticate access and setup scheduled token update
         const requestOptions = await requestHelper.buildRequestOptions(request, 'POST');
@@ -60,7 +57,7 @@ exports.getGeneralDiagnosis = async(request, response, next) => {
         for(let entity of searchData.destinationEntities) {
             if(entity.matchingPVs && Array.isArray(entity.matchingPVs)) {
                 for(let pv of entity.matchingPVs) {
-                    // avoid duplicate data in searchDataOutput
+                    // avoid duplicate data in searchQueryOutput
                     if(foundationUrisArray.includes(pv.foundationUri)) {
                         break
                     }
@@ -72,16 +69,24 @@ exports.getGeneralDiagnosis = async(request, response, next) => {
                 }
             }
         }
-    
-        const searchDataOutput = {
+
+        // Handle ICD API Buggy URI (Debug_Log issue 2)
+        const cleanedUrisArray = []
+        for (let uri of foundationUrisArray) {
+            const cleanedUris = uri.split(/[&]/).map(part => part.trim())
+            cleanedUris.map(uri => cleanedUrisArray.push(uri))
+        }
+
+        // pack search data for LookUp query
+        const searchQueryOutput = {
             label: labelsArray,
             score: scoresArray,
-            foundationURI: foundationUrisArray,
+            foundationURI: cleanedUrisArray,
         }
 
         // lookup foundationURI
         const lookUpRequestOptions = await requestHelper.buildRequestOptions(request, 'GET');
-        const diagnosisData = await searchHelper.generateDiagnosisData(lookUpRequestOptions, searchDataOutput);
+        const diagnosisData = await searchHelper.generateDiagnosisData(lookUpRequestOptions, searchQueryOutput);
         response.status(200).json(diagnosisData)
     } 
     catch(error) {
@@ -126,22 +131,22 @@ exports.getSpecificDiagnosis = async(request, response) => {
         foundationUrisArray.push(searchData.foundationURI)
         scoresArray.push(searchData.matchScore)
 
-        const searchDataOutput = {
+        const searchQueryOutput = {
             label: labelsArray,
             foundationURI: foundationUrisArray,
             score: scoresArray
         };
 
         // console.log(`\nSearched for: ${searchData.searchText}
-        // Results : ${searchDataOutput.label}
+        // Results : ${searchQueryOutput.label}
         // ICD code: ${searchData.theCode}
-        // Foundation URI: ${searchDataOutput.foundationURI}
-        // Relevancy Score: ${searchDataOutput.score}
+        // Foundation URI: ${searchQueryOutput.foundationURI}
+        // Relevancy Score: ${searchQueryOutput.score}
         // \n`);
 
         // lookup foundationURI
         const lookUpRequestOptions = await requestHelper.buildRequestOptions(request, 'GET');
-        const diagnosisData = await searchHelper.generateDiagnosisData(lookUpRequestOptions, searchDataOutput);
+        const diagnosisData = await searchHelper.generateDiagnosisData(lookUpRequestOptions, searchQueryOutput);
         response.status(200).json(diagnosisData)
     } 
     catch(error) {

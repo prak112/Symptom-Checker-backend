@@ -14,3 +14,16 @@
 
 <hr>
 <br>
+
+# 2 - ICD API Buggy Foundation URI
+- **Context**
+    - For 'knee pain' symptom the API returns the following `foundationUri` :
+     `'http://id.who.int/icd/entity/9272848 & http://id.who.int/icd/entity/1574110781'`
+    - This bug threw up while running the API `lookup` query using `foundationUri`
+- **Solution** 
+    - Split string on `&` 
+    - Trim spaces, add (`map`, and `push`) cleaned URIs to `cleanedUrisArray` 
+    - Expected consequences to deal with = **2 * n+ items in 'url', 'title', 'detail'** where *n = total number of buggy* `foundationUri`s
+
+<hr>
+<br>
