@@ -17,7 +17,8 @@
 
 # 2 - ICD API Buggy Foundation URI
 - **Context**
-    - For 'knee pain' symptom the API returns the following `foundationUri` :
+    - For 'knee pain' or 'knee joint pain' symptom Search query on https://id.who.int/icd/release/11/2024-01/mms/search sometimes returns 2 `foundationUri`s joined by '&'. 
+    - For instance as follows :
      `'http://id.who.int/icd/entity/9272848 & http://id.who.int/icd/entity/1574110781'`
     - This bug threw up while running the API `lookup` query using `foundationUri`
 - **Solution** 
