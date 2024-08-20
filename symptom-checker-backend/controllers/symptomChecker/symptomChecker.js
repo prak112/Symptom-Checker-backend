@@ -54,6 +54,7 @@ exports.getGeneralDiagnosis = async(request, response, next) => {
 
         // General search results - /icd/release/11/{releasId}/{linearizationName}/search
         // Data crawl map : destinationEntities--> MatchingPVs--> label, score, foundationUri
+        let uriCount = 0;
         for(let entity of searchData.destinationEntities) {
             if(entity.matchingPVs && Array.isArray(entity.matchingPVs)) {
                 for(let pv of entity.matchingPVs) {
@@ -65,6 +66,8 @@ exports.getGeneralDiagnosis = async(request, response, next) => {
                         labelsArray.push(pv.label);
                         scoresArray.push(pv.score);
                         foundationUrisArray.push(pv.foundationUri);
+                        uriCount++;
+                        console.log('URI #',uriCount,' : ', pv.foundationUri);                        
                     }
                 }
             }
@@ -76,6 +79,12 @@ exports.getGeneralDiagnosis = async(request, response, next) => {
             const cleanedUris = uri.split(/[&]/).map(part => part.trim())
             cleanedUris.map(uri => cleanedUrisArray.push(uri))
         }
+        console.log(`SEARCH data AFTER filtering Duplicates (foundationUri) :
+            LABELS: ${labelsArray.length}
+            SCORES: ${scoresArray.length}
+            Original URIs : ${foundationUrisArray.length}
+            Cleaned URIs : ${cleanedUrisArray.length}
+        `)
 
         // pack search data for LookUp query
         const searchQueryOutput = {
