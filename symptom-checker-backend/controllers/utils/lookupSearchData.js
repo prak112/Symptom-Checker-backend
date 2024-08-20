@@ -1,29 +1,32 @@
 const requestHelper = require('./requestBuilder')
 
 /** REFACTOR diagnosisData
- * Recieve all results, no limitations - DONE
- * Collect highest Score with -'label,'title/detail','url' as 'topResult'
+ * DONE - Recieve all results, no limitations                  
+ * DONE - Omit records, If 'detail' and 'url' has 'NA'        
+ * DEBUG - 'knee pain' search provides buggy foundationUri. Refactor lookupParams to handle unexpected URIs.
+ * Collect highest Score with -'label,'title/detail','url' as 'topResult' 
  * Collect negative Score as 'excludedResults' and positive Score as 'includedResults' 
  * Repeat the following procedure for both Result Sets :
-    * Filter out duplicate Url(browserUrls) - DONE(in searchDataOutput)
+    * DONE(in searchQueryOutput) - Filter out duplicate Url(browserUrls)   
     * Package data by each user-provided symptom
     * For each user-provided symptom :
         * Filter 'topResult' by Score (for highlighted rendering) with Label, Detail, Score and Url
         * Sort results by Score in descending order and tag related Label (for <Chip/> rendering with Label and Score)
-        * Omit Title and Detail for results, except 'topResult'
+        * Omit 'title' and 'detail' for results, except 'topResult'
 **/
 
-async function generateDiagnosisData(requestOptions, searchDataOutput) {
+async function generateDiagnosisData(requestOptions, searchQueryOutput) {
     // initialize diagnosis data
     const urlsArray = [];
     const titlesArray = [];
     const detailsArray = [];
-    // lookup each foundationUri from searchDataOutput
-    for(uri of searchDataOutput.foundationURI){
+    // lookup each foundationUri from searchQueryOutput
+    for(let uri of searchQueryOutput.foundationURI){
         const lookupUrl = 'https://id.who.int/icd/release/11/2024-01/mms/lookup';
         const lookupParams = {
             foundationUri: uri
         };
+        //console.log('\nLookUp Parameters : ', lookupParams)
         const lookupEndpoint = requestHelper.buildRequestEndpoint(lookupParams, lookupUrl);
         const lookupResponse = await fetch(lookupEndpoint, requestOptions);
         const lookupData = await lookupResponse.json();
@@ -40,37 +43,57 @@ async function generateDiagnosisData(requestOptions, searchDataOutput) {
             : detailsArray.push('NA')
     }
 
-    // filter for duplicates - 
-    // title, url, searchDataOutput.label, searchDataOutput.score
-    console.log(`\nLOOKUP data AFTER filtering for duplicates :
-    LABELS: ${searchDataOutput.label.length}
-    SCORES: ${searchDataOutput.score.length}
-    URLS : ${urlsArray.length}
-    TITLES : ${titlesArray.length}
-    DETAILS : ${detailsArray.length}    
+    // Filter records in all arrays, If 'detail' and 'url' has 'NA'
+    const totalRecords = Math.min(detailsArray.length, urlsArray.length)
+    // using Set for efficient lookup
+    const recordsToRemove = new Set()    
+    for(let i = 0; i < totalRecords; i++) {
+        if(detailsArray[i] === 'NA' && urlsArray[i] === 'NA') {
+            recordsToRemove.add(i)
+        }        
+    }
+    console.log('\nRecords To Remove : \n', recordsToRemove);
+    console.log(`Total Records :
+        BEFORE : ${totalRecords}
+        AFTER : ${totalRecords - recordsToRemove.size}
     `)
+
+    // Array elements with indices in recordsToRemove are filtered-out iteratively
+    const filteredLabels = searchQueryOutput.label.filter((_, index) => !recordsToRemove.has(index))
+    const filteredScores = searchQueryOutput.score.filter((_, index) => !recordsToRemove.has(index))
+    const filteredUrls = urlsArray.filter((_, index) => !recordsToRemove.has(index))
+    const filteredTitles = titlesArray.filter((_, index) => !recordsToRemove.has(index))
+    const filteredDetails = detailsArray.filter((_, index) => !recordsToRemove.has(index))  
     
 
-    // // sort by descending 'score'
-
+    console.log(`LOOKUP data AFTER filtering Duplicates and NA records(url and detail) :
+    LABELS: ${filteredLabels.length}
+    SCORES: ${filteredScores.length}
+    URLS : ${filteredUrls.length}
+    TITLES : ${filteredTitles.length}
+    DETAILS : ${filteredDetails.length}    
+    `)
+    
+    // sort resultSet (aka diagnosisData) by descending 'score'
+    
 
     // // split processed data
     // const topResult = {
-    //     label: searchDataOutput.label,
-    //     score: searchDataOutput.score,        
-    //     title: titlesArray,
-    //     detail: detailsArray,
-    //     url: urlsArray,
+    //     label: filteredLabels,
+    //     score: filteredScores,        
+    //     title: filteredTitles,
+    //     detail: filteredDetails,
+    //     url: filteredUrls,
     // }
     // const includedResults = {
-    //     label: searchDataOutput.label,
-    //     score: searchDataOutput.score,        
-    //     url: urlsArray,
+    //     label: filteredLabels,
+    //     score: filteredScores,        
+    //     url: filteredUrls,
     // }
     // const excludedResults = {
-    //     label: searchDataOutput.label,
-    //     score: searchDataOutput.score,        
-    //     url: urlsArray,
+    //     label: filteredLabels,
+    //     score: filteredScores,        
+    //     url: filteredUrls,
     // }
     // // pack `topResult`, `includedResults`, `excludedResults` into diagnosisData
     // const diagnosisData = {
@@ -79,13 +102,13 @@ async function generateDiagnosisData(requestOptions, searchDataOutput) {
     //     excludedResults: excludedResults,
     // }
 
-    // pack searchDataOutput and LookUp API query data variables
+    // pack searchQueryOutput and LookUp data variables
     const diagnosisData = {
-        label: searchDataOutput.label,
-        score: searchDataOutput.score,        
-        title: titlesArray,
-        detail: detailsArray,
-        url: urlsArray,
+        label: filteredLabels,
+        score: filteredScores,        
+        title: filteredTitles,
+        detail: filteredDetails,
+        url: filteredUrls,
     };    
     return diagnosisData;
 }
