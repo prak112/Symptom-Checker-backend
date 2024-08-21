@@ -15,16 +15,40 @@
 <hr>
 <br>
 
-# 2 - ICD API Buggy Foundation URI
-- **Context**
+# 2 - ICD API Buggy `foundationUri`
+- **Context** :
     - For 'knee pain' or 'knee joint pain' symptom Search query on https://id.who.int/icd/release/11/2024-01/mms/search sometimes returns 2 `foundationUri`s joined by '&'. 
     - For instance as follows :
      `'http://id.who.int/icd/entity/9272848 & http://id.who.int/icd/entity/1574110781'`
     - This bug threw up while running the API `lookup` query using `foundationUri`
-- **Solution** 
-    - Split string on `&` 
-    - Trim spaces, add (`map`, and `push`) cleaned URIs to `cleanedUrisArray` 
-    - Expected consequences to deal with = **2 * n+ items in 'url', 'title', 'detail'** where *n = total number of buggy* `foundationUri`s
+- **Solution** : 
+    - INSTEAD of *Splitting*, *Slicing* by the delimiter `&` 
+    - Select the 1st URI, Trim spaces and `push` the cleaned URI to `cleanedUrisArray` 
+    - Expected consequences from Splitting :
+        - to deal with = **2 * n+ items in 'url', 'title', 'detail'** where *n = total number of buggy* `foundationUri`s
+    - Expected consequences from *Slicing* :
+        - Loss of an additional URI. 
+        - However without a relevant label and score, it is useless.
+        - Issue 2.1 (below) is resolved.
+
+<hr>
+
+## 2.1 - Complication from Buggy `foundationUri`
+- **Context** :
+    - Procedure to sort 'score' in descending order results in unexpected complication
+    - Procedure is as follows :
+        * sort `filteredScores` by pairing `{score, index}` as `sortedFilteredScores`
+        * get the sorted indices from `sortedFilteredScores`
+        * reorder the rest of the filtered arrays based on the sorted indices of `sortedFilteredScores`
+    - Resulting Complications :
+        * Total records from `searchQueryOutput`(`label`, `score`) !== `lookupData`(`url`, `title`, `detail`)
+            * Above complication only happens for certain symptoms (ex. knee pain, knee joint pain)
+            * DUE to Buggy-foundationUri Issue from ICD API
+        * However, frontend ONLY renders the lowest number, i.e., searchQueryOutput record count
+        * As long as record count in `searchQueryOutput` < `lookupData`, No issues will be found.
+- **Solution** :
+    - *Slicing* the Buggy Uri string INSTEAD of *Splitting*.
 
 <hr>
 <br>
+
