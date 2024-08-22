@@ -13,11 +13,6 @@ TO-DOs:
 // POST - 'General' search result from symptoms list
 exports.getGeneralDiagnosis = async(request, response, next) => {
     try {
-        // // intialize arrays for diagnosis data
-        // let labelsArray = []
-        // let scoresArray = []
-        // let foundationUrisArray = []
-
         // retrieve symptoms
         // sample - ['knee joint pain', 'spinal cord pain', 'shoulder pain', 'cough', 'fever']
         const symptoms =  request.body.symptoms
