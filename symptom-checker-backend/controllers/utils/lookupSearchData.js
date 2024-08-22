@@ -1,21 +1,6 @@
 const requestHelper = require('./requestBuilder')
 const dataProcessor = require('./refineQueryResults')
 
-/** REFACTOR diagnosisData
- * DONE - Recieve all results, no limitations                  
- * DONE - Omit records, If 'detail' and 'url' has 'NA'        
- * DONE - DEBUG - 'knee pain' search provides buggy foundationUri. Refactor lookupParams to handle unexpected URIs.
- * DONE - Collect highest Score with -'label,'title/detail','url' as 'topResult' 
- * DONE - Collect negative Score as 'excludedResults' and positive Score as 'includedResults' 
- * Repeat the following procedure for both Result Sets :
-    * DONE(in searchQueryOutput) - Filter out duplicate Url(browserUrls)   
-    * Package data by each user-provided symptom
-    * For each user-provided symptom :
-        * Filter 'topResult' by Score (for highlighted rendering) with Label, Detail, Score and Url
-        * Sort results by Score in descending order and tag related Label (for <Chip/> rendering with Label and Score)
-        * Omit 'title' and 'detail' for 'excludedResults' AND 'includedResults'
-**/
-
 /**
  * Generates diagnosis data based on the given requestOptions and searchQueryOutput.
  * @param {Object} requestOptions - The options for the request.
@@ -69,14 +54,15 @@ async function generateDiagnosisData(requestOptions, searchQueryOutput) {
 
     // reorder all arrays based on sortedScoresIndices
     const sortedLabels = dataProcessor.reorderArray(filteredLabels, filteredScores)
-    const sortedScores = dataProcessor.reorderArray(filteredScores, filteredScores)
+    const sortedDecimalScores = dataProcessor.reorderArray(filteredScores, filteredScores)
+    const sortedNumericalScores = sortedDecimalScores.map(score => Math.round((score * 100), 2))
     const sortedUrls = dataProcessor.reorderArray(filteredUrls, filteredScores)
     const sortedTitles = dataProcessor.reorderArray(filteredTitles, filteredScores)
     const sortedDetails = dataProcessor.reorderArray(filteredDetails, filteredScores)
     
     console.log(`Sorted Arrays :
     LABELS: ${sortedLabels.length}
-    SCORES : ${sortedScores.length}
+    SCORES : ${sortedNumericalScores.length}
     TITLES : ${sortedTitles.length}
     DETAILS : ${sortedDetails.length}    
     URLS : ${sortedUrls.length}
@@ -86,17 +72,17 @@ async function generateDiagnosisData(requestOptions, searchQueryOutput) {
     // processed = (filter duplicates and NA records)+(subset arrays by filteredScores.length)+(sort by sortedScoreIndices)
     const topResult = {
         label: sortedLabels[0],
-        score: sortedScores[0],        
+        score: sortedNumericalScores[0],        
         title: sortedTitles[0],
         detail: sortedDetails[0],
         url: sortedUrls[0],
     }
     console.log('\nTOP Result : ', topResult);
     // locate negative scores to setup slicing point
-    const resultsExclusionIndex = sortedScores.findIndex(score => score < 0)
+    const resultsExclusionIndex = sortedNumericalScores.findIndex(score => score < 0)
     // slice for includedResults
     const includedLabels = sortedLabels.slice(1, resultsExclusionIndex)
-    const includedScores = sortedScores.slice(1, resultsExclusionIndex)
+    const includedScores = sortedNumericalScores.slice(1, resultsExclusionIndex)
     const includedUrls = sortedUrls.slice(1, resultsExclusionIndex)
     const includedResults = {
         label: includedLabels,
@@ -106,7 +92,7 @@ async function generateDiagnosisData(requestOptions, searchQueryOutput) {
     console.log('INCLUDED Results : ', includedResults)
     // slice for excludedResults
     const excludedLabels = sortedLabels.slice(resultsExclusionIndex)
-    const excludedScores = sortedScores.slice(resultsExclusionIndex)
+    const excludedScores = sortedNumericalScores.slice(resultsExclusionIndex)
     const excludedUrls = sortedUrls.slice(resultsExclusionIndex)
     const excludedResults = {
         label: excludedLabels,
@@ -115,22 +101,21 @@ async function generateDiagnosisData(requestOptions, searchQueryOutput) {
     }
     console.log('EXCLUDED Results : ', excludedResults)
 
-    // // pack processed data and results
-    // const diagnosisData = {
-    //     symptoms: symptomsArray, 
-    //     topResult: topResult,
-    //     includedResults: includedResults,
-    //     excludedResults: excludedResults,
-    // }
-
-    // pack searchQueryOutput and LookUp data variables
+    // pack processed data and results
     const diagnosisData = {
-        label: sortedLabels,
-        score: sortedScores,        
-        title: sortedTitles,
-        detail: sortedDetails,
-        url: sortedUrls,
-    };    
+        topResult: topResult,
+        includedResults: includedResults,
+        excludedResults: excludedResults,
+    }
+
+    // // pack searchQueryOutput and LookUp data variables
+    // const diagnosisData = {
+    //     label: sortedLabels,
+    //     score: sortedNumericalScores,        
+    //     title: sortedTitles,
+    //     detail: sortedDetails,
+    //     url: sortedUrls,
+    // };    
     return diagnosisData;
 }
 
