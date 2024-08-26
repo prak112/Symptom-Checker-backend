@@ -25,7 +25,7 @@ const mongoose = require('mongoose')
 mongoose
     .connect(config.MONGODB_URI)
     .then(() => {
-        logger.info('Connected to MongoDB')
+        logger.info('\nConnected to MongoDB 🔗 \n')
     })
     .catch((error) => {
         logger.info('Error connecting to MongoDB!\nERROR: ', error.message)
