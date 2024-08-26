@@ -101,21 +101,13 @@ async function generateDiagnosisData(requestOptions, searchQueryOutput) {
     }
     console.log('EXCLUDED Results : ', excludedResults)
 
-    // pack processed data and results
+    // pack processed data
     const diagnosisData = {
         topResult: topResult,
         includedResults: includedResults,
         excludedResults: excludedResults,
     }
 
-    // // pack searchQueryOutput and LookUp data variables
-    // const diagnosisData = {
-    //     label: sortedLabels,
-    //     score: sortedNumericalScores,        
-    //     title: sortedTitles,
-    //     detail: sortedDetails,
-    //     url: sortedUrls,
-    // };    
     return diagnosisData;
 }
 

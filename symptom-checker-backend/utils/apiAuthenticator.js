@@ -8,6 +8,14 @@ let tokenInfo = {
 }
 console.log('Token info set')
 
+/**
+ * Authenticates API access using the provided token endpoint and options.
+ * 
+ * @param {string} tokenEndpoint - The endpoint to fetch the access token from.
+ * @param {object} tokenOptions - The options to be passed to the token endpoint.
+ * @returns {Promise<string>} - A promise that resolves to the access token.
+ * @throws {Error} - If there is an error fetching the token.
+ */
 async function authenticateApiAccess(tokenEndpoint, tokenOptions){
 try {
         if (!tokenInfo.accessToken) {
@@ -25,6 +33,16 @@ try {
     }
 }
 
+/**
+ * Fetches a token and updates the token information.
+ * 
+ * @param {Object} tokenData - The token data object.
+ * @param {string} tokenData.token_type - The type of the token.
+ * @param {string} tokenData.access_token - The access token.
+ * @param {number} tokenData.expires_in - The expiration time of the token in seconds.
+ * @returns {string} - The access token.
+ * @throws {Error} - If there is an error fetching the token.
+ */
 function fetchToken(tokenData) {
     try {        
         console.log('Token type: ', tokenData.token_type)
@@ -44,6 +62,7 @@ function fetchToken(tokenData) {
             currentTime.getTime() + (tokenInfo.expiresIn * 1000)
         ).toLocaleTimeString()
         tokenInfo.updateTimeout = setInterval(async() => {
+            // renewal failure : return variable from authenticateApiAcess not caught in tokenInfo.accessToken
             await authenticateApiAccess(tokenInfo.tokenEndpoint, tokenInfo.tokenOptions);
             let tokenRenewedTime = new Date().toLocaleTimeString()
             console.log('Token updated - ', tokenRenewedTime);

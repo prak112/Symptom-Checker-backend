@@ -32,7 +32,16 @@ const tokenOptions = {
 logger.info('Options set');
 // ICD API authentication process
 logger.info('Initiate ICD API authentication...')
-const token = apiAuthenticator.authenticateApiAccess(tokenEndpoint, tokenOptions) 
+const token = apiAuthenticator.authenticateApiAccess(tokenEndpoint, tokenOptions)
+ 
+/**
+ * Middleware function to authenticate the request.
+ * 
+ * @param {Object} request - The request object.
+ * @param {Object} response - The response object.
+ * @param {Function} next - The next middleware function.
+ * @returns {void}
+ */
 const authenticate = (request, response, next) => {
    try {
       request.accessToken = token
