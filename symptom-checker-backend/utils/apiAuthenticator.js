@@ -18,15 +18,13 @@ console.log('Token info set')
  */
 async function authenticateApiAccess(tokenEndpoint, tokenOptions){
 try {
-        if (!tokenInfo.accessToken) {
-            tokenInfo.tokenEndpoint = tokenEndpoint
-            tokenInfo.tokenOptions = tokenOptions
-            const tokenClient = await fetch(tokenInfo.tokenEndpoint, tokenInfo.tokenOptions)
-            const data = await tokenClient.json()
-            return fetchToken(data)
-        } else {
-            return tokenInfo.accessToken
-        }
+        tokenInfo.tokenEndpoint = tokenEndpoint
+        tokenInfo.tokenOptions = tokenOptions
+        const tokenClient = await fetch(tokenInfo.tokenEndpoint, tokenInfo.tokenOptions)
+        console.log('Communicating with API Token Client...')
+        const data = await tokenClient.json()
+        
+        return fetchToken(data)
     } catch (error) {
         console.log('ERROR fetching Token : ', error.message)
         next(error)
@@ -61,14 +59,15 @@ function fetchToken(tokenData) {
         let tokenExpiryTime = new Date(
             currentTime.getTime() + (tokenInfo.expiresIn * 1000)
         ).toLocaleTimeString()
+
         tokenInfo.updateTimeout = setInterval(async() => {
-            // renewal failure : return variable from authenticateApiAcess not caught in tokenInfo.accessToken
-            await authenticateApiAccess(tokenInfo.tokenEndpoint, tokenInfo.tokenOptions);
+            tokenInfo.accessToken = await authenticateApiAccess(tokenInfo.tokenEndpoint, tokenInfo.tokenOptions);
+            console.log('Renewed Token Info : ', tokenInfo.accessToken)
             let tokenRenewedTime = new Date().toLocaleTimeString()
             console.log('Token updated - ', tokenRenewedTime);
-        }, (tokenInfo.expiresIn - 30) * 1000);
-
-        console.log(`Token generated at ${tokenGeneratedTime}\nToken will be renewed at ${tokenExpiryTime}`)
+        }, (tokenInfo.expiresIn - 30) * 1000); 
+        console.log(`\nToken generated at ${tokenGeneratedTime}\nToken will be renewed at ${tokenExpiryTime}`)
+        
         return tokenInfo.accessToken
     } catch (error) {
         console.log('ERROR fetching Token : ', error.message)
