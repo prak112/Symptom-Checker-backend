@@ -9,104 +9,126 @@
     - `node`
 
 ## Workflow
-- Sequence Diagram rendered using `mermaid`
-- Refer [Frontend Workflow]()
+- All diagrams rendered using *Mermaid*
+- Refer [Frontend Workflow](https://github.com/prak112/Symptom-Checker-frontend#workflow)
 
+- Database Schema represented in Class Diagram
 
-```mermaid
-sequenceDiagram
-    box Blue CLIENT
-    participant FRONTEND
-    end
+    ```mermaid
+    classDiagram
+        class User {
+            +String username
+            +String passwordHash
+            +List~ObjectId~ symptom
+        }
+        class Symptom {
+            +String symptom
+            +String diagnosis
+            +ObjectId user
+        }
 
-    box Purple SERVER
-    participant BACKEND
-    participant ICD11 API
-    participant DATABASE
-    end
+        Symptom --> User : user
+        User --> Symptom : symptom
+    ```
 
-    critical Establish Database connection
-        BACKEND-->DATABASE: Mongoose ODM connects to MongoDB
-    option Network Timeout
-        BACKEND-->BACKEND: Log Timeout Error
-    option MongoDB Error
-        BACKEND-->BACKEND: Log Validation Error
-    end
-    critical Authorize ICD API Access
-        loop Scheduled Renewal of Auth Token every hour
-            BACKEND->>+ICD11 API: Auth Controller : POST /token-endpoint/client-credentials
-            ICD11 API-->>-BACKEND: Auth Token : Bearer, 3600 seconds validity
-        end
-    option Network Timeout
-        BACKEND-->BACKEND: Log Timeout Error
-    option API Error
-        BACKEND-->BACKEND: Log Server Error    
-    end
+<hr>
 
-    alt Valid Registration
-        Note over FRONTEND: <Signup /> validation - PASSED
-        FRONTEND->>+BACKEND: Auth Service : POST /public/auth/signup
-        Note over BACKEND, DATABASE: Backend-Database validation - PASSED        
-        BACKEND-->+DATABASE: Auth Controller : User Information {username: '', passwordHash: ''}
-        DATABASE-->>-BACKEND: Database Server : User {username: '', symptom: [] }
-        BACKEND-->>-FRONTEND: Auth Controller : return User {username: '', symptom: []}
-        Note over FRONTEND: <AlertProvider /> state success
-    else Backend-Database Validation Error
-        Note over FRONTEND: <Signup /> validation - PASSED
-        FRONTEND->>+BACKEND: Auth Service : POST /public/auth/signup
-        Note over BACKEND, DATABASE: Backend-Database validation - FAILED
-        BACKEND-->>-FRONTEND: Auth Controller : ErrorHandler forwards response
-        Note over FRONTEND: Display error notification
-    end
-    alt Valid Login
-        Note over FRONTEND: <Login /> validation - PASSED
-        FRONTEND->>+BACKEND: Auth Service : POST /public/auth/login
-        BACKEND->>+DATABASE: Auth Controller : verify User login credentials
-        DATABASE-->>-BACKEND: Database Server : User exists
-        Note over BACKEND, DATABASE: Backend-Database validation - PASSED
-        BACKEND-->>-FRONTEND: Auth Controller : sessionStorage created<br>'auth_token' packed in Request Header
-        Note over FRONTEND: <AlertProvider /> state success
-    else Backend-Database Validation Error
-        Note over FRONTEND: <Login /> validation - PASSED
-        FRONTEND->>+BACKEND: Auth Service : POST /public/auth/login
-        BACKEND->>+DATABASE: Auth Controller : verify User Information {username: '', password: ''}
-        DATABASE-->>-BACKEND: Auth Controller : User does not exist
-        Note over BACKEND, DATABASE: Backend-Database validation - FAILED
-        BACKEND-->>-FRONTEND: Auth Controller : ErrorHandler forwards response
-        Note over FRONTEND: Display error notification
-    end
+- Backend Workflows represented in Sequence Diagram
 
-    alt General Symptoms search
-        Note over FRONTEND: <SymptomForm /> validation - PASSED
-        FRONTEND->>+BACKEND: POST /api/protected/symptoms/general
-	Note over BACKEND: Sanitize and Validate User input  
-        BACKEND->>+ICD11 API: SymptomChecker Controller : GET /icd/release/11/2024-01/mms/search
-        ICD11 API-->>-BACKEND: External Server : search results {}<br>locate {'label': '', 'score': '', 'foundationUri': ''} 
-        BACKEND->>+ICD11 API: SymptomChecker Controller : GET /icd/release/11/2024-01/mms/lookup 
-        ICD11 API-->>-BACKEND: External Server : lookup results {}<br>locate {'title': '', 'definition': '', 'browserUrl': ''}
-        BACKEND-->>-FRONTEND: SymptomChecker Controller: diagnosisData {'topResult': {}, 'includedResults': {}, 'excludedResults': {}}
-        par
-            BACKEND->>+DATABASE: SymptomChecker Controller : encrypt and store symptoms, diagnosisData
-        and
-            Note over FRONTEND: <SymptomForm /> render diagnosisData
+    ```mermaid
+    sequenceDiagram
+        box Blue CLIENT
+        participant FRONTEND
         end
 
-    else Specific Symptoms search
-        Note over FRONTEND: <SymptomForm /> validation - PASSED
-        FRONTEND->>+BACKEND: POST /api/protected/symptoms/specific
-	Note over BACKEND: Sanitize and Validate User input  
-        BACKEND->>+ICD11 API: SymptomChecker Controller : GET /icd/release/11/2024-01/mms/autocode
-        ICD11 API-->>-BACKEND: External Server : search results {}<br>locate {'label': '', 'score': '', 'foundationUri': ''} 
-        BACKEND->>+ICD11 API: SymptomChecker Controller : GET /icd/release/11/2024-01/mms/lookup 
-        ICD11 API-->>-BACKEND: External Server : lookup results {}<br>locate {'title': '', 'definition': '', 'browserUrl': ''}
-        BACKEND-->>-FRONTEND: SymptomChecker Controller: diagnosisData {'topResult': {}, 'includedResults': {}, 'excludedResults': {}}
-        par
-            BACKEND->>+DATABASE: SymptomChecker Controller : encrypt and store symptoms, diagnosisData
-        and
-            Note over FRONTEND: <SymptomForm /> render diagnosisData
+        box Purple SERVER
+        participant BACKEND
+        participant ICD11 API
+        participant DATABASE
         end
-    end
-```
+
+        critical Establish Database connection
+            BACKEND-->DATABASE: Mongoose ODM connects to MongoDB
+        option Network Timeout
+            BACKEND-->BACKEND: Log Timeout Error
+        option MongoDB Error
+            BACKEND-->BACKEND: Log Validation Error
+        end
+        critical Authorize ICD API Access
+            loop Scheduled Renewal of Auth Token every hour
+                BACKEND->>+ICD11 API: Auth Controller : POST /token-endpoint/client-credentials
+                ICD11 API-->>-BACKEND: Auth Token : Bearer, 3600 seconds validity
+            end
+        option Network Timeout
+            BACKEND-->BACKEND: Log Timeout Error
+        option API Error
+            BACKEND-->BACKEND: Log Server Error    
+        end
+
+        alt Valid Registration
+            Note over FRONTEND: <Signup /> validation - PASSED
+            FRONTEND->>+BACKEND: Auth Service : POST /public/auth/signup
+            Note over BACKEND, DATABASE: Backend-Database validation - PASSED        
+            BACKEND-->+DATABASE: Auth Controller : User Information {username: '', passwordHash: ''}
+            DATABASE-->>-BACKEND: Database Server : User {username: '', symptom: [] }
+            BACKEND-->>-FRONTEND: Auth Controller : return User {username: '', symptom: []}
+            Note over FRONTEND: <AlertProvider /> state success
+        else Backend-Database Validation Error
+            Note over FRONTEND: <Signup /> validation - PASSED
+            FRONTEND->>+BACKEND: Auth Service : POST /public/auth/signup
+            Note over BACKEND, DATABASE: Backend-Database validation - FAILED
+            BACKEND-->>-FRONTEND: Auth Controller : ErrorHandler forwards response
+            Note over FRONTEND: Display error notification
+        end
+        alt Valid Login
+            Note over FRONTEND: <Login /> validation - PASSED
+            FRONTEND->>+BACKEND: Auth Service : POST /public/auth/login
+            BACKEND->>+DATABASE: Auth Controller : verify User login credentials
+            DATABASE-->>-BACKEND: Database Server : User exists
+            Note over BACKEND, DATABASE: Backend-Database validation - PASSED
+            BACKEND-->>-FRONTEND: Auth Controller : sessionStorage created<br>'auth_token' packed in Request Header
+            Note over FRONTEND: <AlertProvider /> state success
+        else Backend-Database Validation Error
+            Note over FRONTEND: <Login /> validation - PASSED
+            FRONTEND->>+BACKEND: Auth Service : POST /public/auth/login
+            BACKEND->>+DATABASE: Auth Controller : verify User Information {username: '', password: ''}
+            DATABASE-->>-BACKEND: Auth Controller : User does not exist
+            Note over BACKEND, DATABASE: Backend-Database validation - FAILED
+            BACKEND-->>-FRONTEND: Auth Controller : ErrorHandler forwards response
+            Note over FRONTEND: Display error notification
+        end
+
+        alt General Symptoms search
+            Note over FRONTEND: <SymptomForm /> validation - PASSED
+            FRONTEND->>+BACKEND: POST /api/protected/symptoms/general
+        Note over BACKEND: Sanitize and Validate User input  
+            BACKEND->>+ICD11 API: SymptomChecker Controller : GET /icd/release/11/2024-01/mms/search
+            ICD11 API-->>-BACKEND: External Server : search results {}<br>locate {'label': '', 'score': '', 'foundationUri': ''} 
+            BACKEND->>+ICD11 API: SymptomChecker Controller : GET /icd/release/11/2024-01/mms/lookup 
+            ICD11 API-->>-BACKEND: External Server : lookup results {}<br>locate {'title': '', 'definition': '', 'browserUrl': ''}
+            BACKEND-->>-FRONTEND: SymptomChecker Controller: diagnosisData {'topResult': {}, 'includedResults': {}, 'excludedResults': {}}
+            par
+                BACKEND->>+DATABASE: SymptomChecker Controller : encrypt and store symptoms, diagnosisData
+            and
+                Note over FRONTEND: <SymptomForm /> render diagnosisData
+            end
+
+        else Specific Symptoms search
+            Note over FRONTEND: <SymptomForm /> validation - PASSED
+            FRONTEND->>+BACKEND: POST /api/protected/symptoms/specific
+        Note over BACKEND: Sanitize and Validate User input  
+            BACKEND->>+ICD11 API: SymptomChecker Controller : GET /icd/release/11/2024-01/mms/autocode
+            ICD11 API-->>-BACKEND: External Server : search results {}<br>locate {'label': '', 'score': '', 'foundationUri': ''} 
+            BACKEND->>+ICD11 API: SymptomChecker Controller : GET /icd/release/11/2024-01/mms/lookup 
+            ICD11 API-->>-BACKEND: External Server : lookup results {}<br>locate {'title': '', 'definition': '', 'browserUrl': ''}
+            BACKEND-->>-FRONTEND: SymptomChecker Controller: diagnosisData {'topResult': {}, 'includedResults': {}, 'excludedResults': {}}
+            par
+                BACKEND->>+DATABASE: SymptomChecker Controller : encrypt and store symptoms, diagnosisData
+            and
+                Note over FRONTEND: <SymptomForm /> render diagnosisData
+            end
+        end
+    ```
 
 <hr>
 <br>
@@ -129,3 +151,15 @@ sequenceDiagram
 ```bash
     npm run dev
 ``` 
+
+<hr>
+<br>
+
+# Credits
+- **Coding Assistants** : 
+    - GitHub Copilot
+    - Pieces Copilot
+- **Documentation Tool** : Mermaid
+
+<hr>
+<hr>
