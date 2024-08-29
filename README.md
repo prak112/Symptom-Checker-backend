@@ -14,22 +14,48 @@
 
 - Database Schema represented in Class Diagram
 
-    ```mermaid
-    classDiagram
-        class User {
-            +String username
-            +String passwordHash
-            +List~ObjectId~ symptom
-        }
-        class Symptom {
-            +String symptom
-            +String diagnosis
-            +ObjectId user
-        }
+```mermaid
+classDiagram
+    class User {
+        +String username
+        +String passwordHash
+        +List~ObjectId~ diagnosis
+    }
 
-        Symptom --> User : user
-        User --> Symptom : symptom
-    ```
+    class Diagnosis {
+        +List~DiagnosisData~ diagnosis
+        +ObjectId user
+    }
+
+    class DiagnosisData {
+        +String symptom
+        +TopResult topResult
+        +OtherResults includedResults
+        +OtherResults excludedResults
+    }
+
+    class TopResult {
+        +String label
+        +Number score
+        +String title
+        +String detail
+        +String url
+    }
+
+    class OtherResults {
+        +List~String~ label
+        +List~Number~ score
+        +List~String~ url
+    }
+
+    User --> Diagnosis : diagnosis
+    Diagnosis --> User : user
+    Diagnosis --> DiagnosisData : diagnosis
+    DiagnosisData --> TopResult : topResult
+    DiagnosisData --> OtherResults : includedResults
+    DiagnosisData --> OtherResults : excludedResults
+
+```
 
 <hr>
 
