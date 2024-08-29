@@ -1,5 +1,6 @@
 # Features :
 - [Grouped Search Results](#grouped-search-results)
+- [User Histrory]()
 - [End-to-End Encryption](#end-to-end-encryption)
 - [Geolocation APIs](#geolocation-apis)
 - [Triage System](#triage-system)
@@ -11,6 +12,12 @@
 
 ## Grouped Search Results
 - GitHub Issue [#3](https://github.com/prak112/Symptom-Checker-backend/issues/3)
+
+<hr>
+<br>
+
+## User History
+- GitHub Issue [#12](https://github.com/prak112/Symptom-Checker-backend/issues/12)
 
 <hr>
 <br>
