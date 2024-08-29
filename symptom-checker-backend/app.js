@@ -7,7 +7,7 @@ app.use(cookieParser())
 const cors = require('cors')  // cross-origin resource sharing
 const middleware = require('./utils/middleware')
 const logger = require('./utils/logger')
-const apiAuthController = require('./controllers/auth/apiAuthController')
+const icdAuthController = require('./controllers/auth/icdAuthController')
 const userAuthRouter = require('./routes/userAuthRouter')
 const symptomCheckerRouter = require('./routes/symptomCheckerRouter')
 
@@ -33,7 +33,7 @@ mongoose
 
 // Load Middleware
 // ICD API authentication middeware
-app.use(apiAuthController.authenticate)
+app.use(icdAuthController.authenticate)
 
 // CORS-accepts frontend communication from different origin
 app.use(cors({

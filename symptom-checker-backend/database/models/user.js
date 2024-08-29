@@ -11,7 +11,7 @@ const userSchema = new mongoose.Schema({
     symptom: [
         {
             type: mongoose.Schema.Types.ObjectId,
-            ref: 'Symptoms'
+            ref: 'Symptom'
         }
     ]
 })

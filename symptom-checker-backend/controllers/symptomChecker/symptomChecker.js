@@ -1,14 +1,10 @@
-// import utils
+// utility functions
 const requestHelper = require('../utils/requestBuilder')
 const searchHelper = require('../utils/lookupSearchData')
 const dataProcessor = require('../utils/refineQueryResults')
+// database controllers
 
-/* REFACTOR diagnosisData
-TO-DOs:
-=======
-- Setup MongoDB collection and data storage
-- FEATURE: Show pain location in 2D-body image 
-*/
+
 
 // POST - 'General' search result from symptoms list
 exports.getGeneralDiagnosis = async(request, response, next) => {
@@ -90,6 +86,19 @@ exports.getGeneralDiagnosis = async(request, response, next) => {
                 ...diagnosisData
             })
         }
+
+        /** Database storage of 'symptoms' and 'diagnosisDataArray'
+         * For registered users -
+            * retrieve user information from response 
+            * query database for user
+            * if user is registered:
+                retrieve user information
+            * else:
+                create guest user with unique ID
+                store session data under guest user
+            * update 'user' collection with 'symptom' data
+            * update 'symptom' collection with 'user' id
+         */
 
         response.status(200).json(diagnosisDataArray)
     } 
