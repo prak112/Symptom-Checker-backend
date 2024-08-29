@@ -2,8 +2,8 @@
 const requestHelper = require('../utils/requestBuilder')
 const searchHelper = require('../utils/lookupSearchData')
 const dataProcessor = require('../utils/refineQueryResults')
-// database controllers
-
+// database controller
+const dataController = require('../../database/controllers/data')
 
 
 // POST - 'General' search result from symptoms list
@@ -87,20 +87,17 @@ exports.getGeneralDiagnosis = async(request, response, next) => {
             })
         }
 
-        /** Database storage of 'symptoms' and 'diagnosisDataArray'
-         * For registered users -
-            * retrieve user information from response 
-            * query database for user
-            * if user is registered:
-                retrieve user information
-            * else:
-                create guest user with unique ID
-                store session data under guest user
-            * update 'user' collection with 'symptom' data
-            * update 'symptom' collection with 'user' id
-         */
+        // store registered/guest user data
+        console.log('Storing user data...')
 
-        response.status(200).json(diagnosisDataArray)
+        const dbResponse = dataController.manageDatabase(request, diagnosisDataArray)
+        if (dbResponse) {
+            response.status(200).json(diagnosisDataArray)
+        } else {
+            response
+                .status(500)
+                .json({ error: 'Failed to store data!' })
+        }
     } 
     catch(error) {
         console.error('ERROR during General search : ', error)
@@ -165,7 +162,15 @@ exports.getSpecificDiagnosis = async(request, response) => {
             })
         }
 
-        response.status(200).json(diagnosisDataArray)
+        // store registered/guest user data
+        const dbResponse = dataController.manageDatabase(request, diagnosisDataArray)
+        if (dbResponse) {
+            response.status(200).json(diagnosisDataArray)
+        } else {
+            response
+                .status(500)
+                .json({ error: 'Failed to store data!' })
+        }
     } 
     catch(error) {
         console.error('ERROR during Specific search : ', error)

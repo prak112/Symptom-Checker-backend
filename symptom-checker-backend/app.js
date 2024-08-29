@@ -7,7 +7,7 @@ app.use(cookieParser())
 const cors = require('cors')  // cross-origin resource sharing
 const middleware = require('./utils/middleware')
 const logger = require('./utils/logger')
-const icdAuthController = require('./controllers/auth/icdAuthController')
+const icdAuthController = require('./controllers/auth/api/icdAuthController')
 const userAuthRouter = require('./routes/userAuthRouter')
 const symptomCheckerRouter = require('./routes/symptomCheckerRouter')
 

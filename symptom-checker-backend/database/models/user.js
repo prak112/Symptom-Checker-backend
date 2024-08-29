@@ -8,10 +8,10 @@ const userSchema = new mongoose.Schema({
         unique: true,
     },  // ValidationError response code 400
     passwordHash: String,   // validation in controllers/signup
-    symptom: [
+    diagnosis: [
         {
             type: mongoose.Schema.Types.ObjectId,
-            ref: 'Symptom'
+            ref: 'Diagnosis'
         }
     ]
 })
