@@ -5,7 +5,7 @@ POST http://localhost:3003/api/protected/symptoms/general HTTP/1.1
 content-type: application/json
 
 {
-    "symptoms": ["back pain, knee pain"]
+    "symptoms": ["wrist pain, knee joints frozen"]
 }
 
 ####
@@ -14,7 +14,7 @@ POST http://localhost:3003/api/protected/symptoms/specific HTTP/1.1
 content-type: application/json
 
 {
-    "symptoms": ["cough, cold, fever"]
+    "symptoms": ["shoulders stiff, spine swollen"]
 }
 
 ####
