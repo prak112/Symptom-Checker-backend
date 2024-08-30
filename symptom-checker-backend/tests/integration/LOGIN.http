@@ -1,5 +1,5 @@
 ####
-#@valid login 1
+#@valid user login 1
 POST http://localhost:3003/public/auth/login HTTP/1.1
 content-type: application/json
 
@@ -9,7 +9,7 @@ content-type: application/json
 }
 
 ####
-#@valid login 2
+#@valid user login 2
 
 POST http://localhost:3003/public/auth/login HTTP/1.1
 content-type: application/json
@@ -18,6 +18,12 @@ content-type: application/json
     "username": "tester deus",
     "password": "F/ippAtyF7a€"
 }
+
+####
+#@valid GUEST login
+POST http://localhost:3003/public/auth/guest HTTP/1.1
+
+
 
 ####
 #@invalid login
