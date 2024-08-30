@@ -88,9 +88,9 @@ exports.getGeneralDiagnosis = async(request, response, next) => {
         }
 
         // store registered/guest user data
-        console.log('Storing user data...')
-
-        const dbResponse = dataController.manageDatabase(request, diagnosisDataArray)
+        console.log('\nStoring user data...')
+        const user = request.user
+        const dbResponse = dataController.manageDatabase(user, diagnosisDataArray)
         if (dbResponse) {
             response.status(200).json(diagnosisDataArray)
         } else {
@@ -163,7 +163,9 @@ exports.getSpecificDiagnosis = async(request, response) => {
         }
 
         // store registered/guest user data
-        const dbResponse = dataController.manageDatabase(request, diagnosisDataArray)
+        console.log('\nStoring user data...')
+        const user = request.user
+        const dbResponse = dataController.manageDatabase(user, diagnosisDataArray)
         if (dbResponse) {
             response.status(200).json(diagnosisDataArray)
         } else {
