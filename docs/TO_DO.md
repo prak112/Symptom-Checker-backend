@@ -1,6 +1,6 @@
 # Features :
 - [X] [Grouped Search Results](#grouped-search-results)
-- [ ] [User Histrory](#user-history)
+- [X] [User Histrory](#user-history)
 - [X] [User Logout Cleanup](#user-logout-cleanup)
 - [ ] [End-to-End Encryption](#end-to-end-encryption)
 - [ ] [Geolocation APIs](#geolocation-apis)
@@ -19,8 +19,9 @@
 
 ## User History
 - GitHub Issue [#12](https://github.com/prak112/Symptom-Checker-backend/issues/12)
-- After successfully saving user data :  
-    - return database information from `data` Controller to Frontend via `symptomChecker` controller
+- Retrieve user data from database by :
+    - Setup endpoint for user history
+    - Setup controller in database directory
 
 <hr>
 <br>
