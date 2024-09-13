@@ -11,6 +11,7 @@ const middleware = require('./utils/middleware')
 const icdAuthController = require('./controllers/auth/api/icdAuthController')
 const userAuthRouter = require('./routes/userAuthRouter')
 const symptomCheckerRouter = require('./routes/symptomCheckerRouter')
+const userDataRouter = require('./routes/userDataRouter')
 // utilities
 const logger = require('./utils/logger')
 
@@ -45,12 +46,12 @@ app.use(middleware.requestLogger)
 
 // authentication middleware
 app.use(middleware.tokenExtractor)
-app.use(middleware.userExtractor)
+//app.use(middleware.userExtractor)
 
 // Route requests
 app.use('/public/auth', userAuthRouter)
 app.use('/api/protected/symptoms', symptomCheckerRouter)
-
+app.use('/api/protected/users', userDataRouter)
 
 // Error handlers
 app.use(middleware.unknownEndpoint)
