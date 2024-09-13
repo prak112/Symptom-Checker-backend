@@ -10,7 +10,7 @@ const User = require('../../../database/models/user')
 exports.authenticateUser = async(request, response) => {
     try {
         const { username, password } = request.body
-        const registeredUser = await User.findOne({username: username})
+        const registeredUser = await User.findOne({username: username}).select('+passwordHash')
         if(!registeredUser){
             logger.error('User does not exist. Signup for access.')
             return response

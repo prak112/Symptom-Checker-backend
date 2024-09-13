@@ -1,13 +1,16 @@
 const mongoose = require('mongoose')
 
 const userSchema = new mongoose.Schema({
-    username: {
+    username: { // ValidationError, response code 400
         type: String,
         minLength: 3,
         required: true,
         unique: true,
-    },  // ValidationError response code 400
-    passwordHash: String,   // validation in controllers/signup
+    },  
+    passwordHash: { // validation in controllers/signup
+        type: String,
+        select: false,  // Exclude by default
+    },   
     diagnosis: [
         {
             type: mongoose.Schema.Types.ObjectId,
@@ -21,7 +24,6 @@ userSchema.set('toJSON', {
         returnedObject.id = returnedObject._id.toString()
         delete returnedObject._id
         delete returnedObject.__v
-        delete returnedObject.passwordHash  // never display hashed password
     }
 })
 
