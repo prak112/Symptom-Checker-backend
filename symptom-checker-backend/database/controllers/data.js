@@ -1,16 +1,6 @@
-// schemas
-const User = require('../models/user')
+// schema
 const Symptom = require('../models/symptom')
 
-/** TO DO - 
- * DONE - create /guest route and controller
- * DONE - use authentication middleware for login handling
- * DONE - refactor manageDatabase
-    * resolves repetition of Guest User creation for every request from same session
- * DONE - Update Database schema in workflow 
-    * (Thanks to Pieces! GitHub Copilot sucks!)
- * DONE - DEBUG - Storage issue with user.id in Symptom object
- */
 
 exports.manageDatabase = async(user, diagnosisDataArray) => {
 try {

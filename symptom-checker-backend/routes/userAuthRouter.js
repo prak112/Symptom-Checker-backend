@@ -13,7 +13,7 @@ router.post('/signup', signUpController.registerUser)
 // Login route
 router.post('/login', loginController.authenticateUser)
 
-// Logout route - To Be Implemented
+// Logout route
 router.post('/logout', logoutController.clearUserSession)
 
 

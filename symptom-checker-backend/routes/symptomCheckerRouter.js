@@ -8,5 +8,5 @@ router.post('/general', middleware.userExtractor, symptomCheckerController.getGe
 // 'Specific' search result
 router.post('/specific', middleware.userExtractor, symptomCheckerController.getSpecificDiagnosis)
 
-
+// export to app
 module.exports = router
