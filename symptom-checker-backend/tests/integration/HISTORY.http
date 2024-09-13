@@ -1,0 +1,6 @@
+####
+
+#diagnosis history of authenticated user
+GET http://localhost:3003/api/protected/users/history 
+
+####
