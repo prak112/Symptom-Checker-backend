@@ -1,20 +1,43 @@
 ####
-#@valid General Diagnosis
+#@valid General-Assessment Diagnosis
 
 POST http://localhost:3003/api/protected/symptoms/general HTTP/1.1
 content-type: application/json
 
 {
-    "symptoms": ["wrist pain, knee joints frozen"]
+    "symptoms": ["wrist pain", "knee joints frozen"],
+    "analysis": "assessment"
 }
 
 ####
-#@valid Specific Diagnosis
+#@valid General-Panel Diagnosis
+
+POST http://localhost:3003/api/protected/symptoms/general HTTP/1.1
+content-type: application/json
+
+{
+    "symptoms": ["wrist pain", "knee joints frozen"],
+    "analysis": "panel"
+}
+
+####
+#@valid Specific-Assessment Diagnosis
 POST http://localhost:3003/api/protected/symptoms/specific HTTP/1.1
 content-type: application/json
 
 {
-    "symptoms": ["shoulders stiff, spine swollen"]
+    "symptoms": ["shoulders stiff", "spine swollen"],
+    "analysis": "assessment"
+}
+
+####
+#@valid Specific-Panel Diagnosis
+POST http://localhost:3003/api/protected/symptoms/specific HTTP/1.1
+content-type: application/json
+
+{
+    "symptoms": ["shoulders stiff", "spine swollen"],
+    "analysis": "panel"
 }
 
 ####
