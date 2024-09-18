@@ -1,4 +1,5 @@
 const mongoose = require('mongoose')
+const { formatISODateToCustom } = require('../utils/formatDate')
 
 const userSchema = new mongoose.Schema({
     username: { // ValidationError, response code 400
@@ -10,6 +11,10 @@ const userSchema = new mongoose.Schema({
     passwordHash: { // validation in controllers/signup
         type: String,
         select: false,  // Exclude by default
+    },
+    registeredAt: {
+        type: Date,
+        default: Date.now,
     },   
     diagnosis: [
         {
@@ -22,6 +27,7 @@ const userSchema = new mongoose.Schema({
 userSchema.set('toJSON', {
     transform: (document, returnedObject) => {
         returnedObject.id = returnedObject._id.toString()
+        returnedObject.registeredAt = formatISODateToCustom(returnedObject.registeredAt)
         delete returnedObject._id
         delete returnedObject.__v
     }
