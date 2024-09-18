@@ -15,7 +15,7 @@ exports.getGeneralDiagnosis = async(request, response, next) => {
         const symptoms =  request.body.symptoms
         const analysisType = request.body.analysis
         console.log('Request Body : ', request.body)
-        console.log('\nSEARCH Query for : ', symptoms);
+        console.log('SEARCH Query for : ', symptoms);
         console.log('Analysis type : ', analysisType)
         
         // setup API auth for search query
@@ -24,7 +24,7 @@ exports.getGeneralDiagnosis = async(request, response, next) => {
 
         const diagnosisDataArray = []
 
-        if (analysisType === "panel") {
+        if (analysisType.includes("panel")) {
             const symptomString = symptoms.toString()
             const diagnosisData = await symptomsProcessor.generateGeneralDiagnosis(request, searchUrl, symptomString)
             diagnosisDataArray.push({
@@ -33,7 +33,7 @@ exports.getGeneralDiagnosis = async(request, response, next) => {
                 ...diagnosisData
             })
         }
-        if (analysisType === "assessment") {
+        if (analysisType.includes("assessment")) {
             for (let symptom of symptoms) {
                 const diagnosisData = await symptomsProcessor.generateGeneralDiagnosis(request, searchUrl, symptom)
                 diagnosisDataArray.push({
@@ -150,7 +150,7 @@ exports.getSpecificDiagnosis = async(request, response) => {
 
         const diagnosisDataArray = []
 
-        if (analysisType === "panel") {
+        if (analysisType.includes("panel")) {
             const symptomString = symptoms.toString()
             const diagnosisData = await symptomsProcessor.generateSpecificDiagnosis(request, searchUrl, symptomString)
             diagnosisDataArray.push({
@@ -159,7 +159,7 @@ exports.getSpecificDiagnosis = async(request, response) => {
                 ...diagnosisData
             })
         }
-        if (analysisType === "assessment") {
+        if (analysisType.includes("assessment")) {
             for (let symptom of symptoms) {
                 const diagnosisData = await symptomsProcessor.generateSpecificDiagnosis(request, searchUrl, symptom)
                 diagnosisDataArray.push({

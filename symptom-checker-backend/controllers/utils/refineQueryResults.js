@@ -8,12 +8,15 @@ function sanitizeUrisArray(foundationUrisArray) {
     const cleanedUrisArray = []
     const buggyUrisArray = []
     for (let uri of foundationUrisArray) {
-        if(uri.includes('&')) {
+        if(uri && uri.includes('&')) {
             buggyUrisArray.push(uri)
             cleanedUrisArray.push(uri.split('&')[0].trim())
         }
-        else {
+        else if(uri) {
             cleanedUrisArray.push(uri)
+        }
+        else {
+            buggyUrisArray.push(uri)
         }
     }
     console.log(`Foundation URI assesment :
