@@ -18,6 +18,8 @@ const topResultSchema = new Schema({
 
 const diagnosisDataSchema = new Schema({
     symptom: { type: String, required: true },
+    analysis: { type: String, required: true },
+    diagnosedAt: { type: Date, default: Date.now },
     topResult: { type: topResultSchema, required: true },
     includedResults: { type: resultSchema, required: true },
     excludedResults: { type: resultSchema, required: true }
