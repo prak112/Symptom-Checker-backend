@@ -31,7 +31,10 @@ exports.authenticateUser = async(request, response) => {
 
         return response
             .status(200)
-            .send({username: registeredUser.username})
+            .send({
+                username: registeredUser.username, 
+                registrationTime: registeredUser.registeredAt
+            })
     } catch (error) {
         logger.error('Error during Login: ', error)
         return response

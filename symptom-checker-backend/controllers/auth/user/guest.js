@@ -28,7 +28,10 @@ exports.createGuestUser = async(request, response) => {
 
         return response
             .status(200)
-            .send({ username: savedGuest.username })
+            .send({ 
+                username: savedGuest.username, 
+                registrationTime: savedGuest.registeredAt 
+            })
     } catch (error) {
         logger.error('ERROR during Guest User creation : ', error)
         return response
