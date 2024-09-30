@@ -30,7 +30,7 @@ exports.createGuestUser = async(request, response) => {
             .status(200)
             .send({ 
                 username: savedGuest.username, 
-                registrationTime: savedGuest.registeredAt 
+                registrationTime: new Date(savedGuest.registeredAt).toLocaleString() 
             })
     } catch (error) {
         logger.error('ERROR during Guest User creation : ', error)
