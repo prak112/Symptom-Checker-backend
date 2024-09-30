@@ -39,7 +39,6 @@ exports.deleteDiagnosisById = async(request, response) => {
         const diagnosisToDelete = await Symptom.findById({id: diagnosisId})
         console.log('Diagnosis record : ', diagnosisToDelete)
         const username = request.user.username
-        const record = diagnosis.diagnosis[0].symptom
         console.log('User info : ', username);
         
         await Symptom.findByIdAndDelete(diagnosisId)
