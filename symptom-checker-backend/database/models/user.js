@@ -14,7 +14,7 @@ const userSchema = new mongoose.Schema({
     },
     registeredAt: {
         type: Date,
-        default: Date.now,
+        default: Date.now,  // ISO8601 format UTC, ex. 2024-09-18T15:46:17.758Z
     },   
     diagnosis: [
         {
@@ -27,7 +27,7 @@ const userSchema = new mongoose.Schema({
 userSchema.set('toJSON', {
     transform: (document, returnedObject) => {
         returnedObject.id = returnedObject._id.toString()
-        returnedObject.registeredAt = formatISODateToCustom(returnedObject.registeredAt)
+        // returnedObject.registeredAt = formatISODateToCustom(returnedObject.registeredAt)
         delete returnedObject._id
         delete returnedObject.__v
     }
