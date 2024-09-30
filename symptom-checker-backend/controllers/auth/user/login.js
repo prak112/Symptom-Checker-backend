@@ -33,7 +33,7 @@ exports.authenticateUser = async(request, response) => {
             .status(200)
             .send({
                 username: registeredUser.username, 
-                registrationTime: registeredUser.registeredAt
+                registrationTime: new Date(registeredUser.registeredAt).toLocaleString()
             })
     } catch (error) {
         logger.error('Error during Login: ', error)
