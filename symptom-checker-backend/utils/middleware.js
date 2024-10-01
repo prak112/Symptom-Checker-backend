@@ -1,18 +1,14 @@
+// utilities
 const logger = require('./logger')
 const config = require('./config')
-const crypto = require('crypto') // session ID generation
-const User = require('../models/user')
+// security context libraries
+const jwt = require('jsonwebtoken')
+// database schema
+const User = require('../database/models/user')
 
 // load Middleware (VERY PARTICULAR ORDER)
 const morgan = require('morgan')    // request logger
 const requestLogger = morgan('dev')
-
-// Request Logger ONLY for development purposes - POST method
-// morgan.token('body', (req, res) => JSON.stringify(req.body) );
-// app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'));
-
-// generate secret variables for .env or session_id
-const secretGenerator = () => crypto.randomBytes(16).toString('hex')
 
 // assign JWT from request headers to request parameters
 const tokenExtractor = (request, response, next) => {
@@ -24,7 +20,7 @@ const tokenExtractor = (request, response, next) => {
 // used to validate requests
 const userExtractor = async(request, response, next) => {
     try{
-        const decodedToken = jwt.verify(request.token, config.SECRET)
+        const decodedToken = jwt.verify(request.token, config.USER_SECRET)
         const user = await User.findById(decodedToken.id)
         if(!user){
             return response
@@ -33,12 +29,11 @@ const userExtractor = async(request, response, next) => {
         }
         request.user = user
         next()
-    }
-    catch(error){
-        logger.error(error)
+    } catch(error) {
+        logger.error('ERROR during User identification : ', error)
         response
             .status(401)
-            .json({error: 'Invalid Token. User authentication failed.' })
+            .json({error: 'Unregistered User. Invalid Token. User authentication failed.' })
     }
 }
 
@@ -69,7 +64,6 @@ const errorHandler = (error, request, response, next) => {
 // export to app
 module.exports = { 
     requestLogger, 
-    secretGenerator,
     tokenExtractor, 
     userExtractor, 
     unknownEndpoint, 

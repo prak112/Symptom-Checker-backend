@@ -14,22 +14,48 @@
 
 - Database Schema represented in Class Diagram
 
-    ```mermaid
-    classDiagram
-        class User {
-            +String username
-            +String passwordHash
-            +List~ObjectId~ symptom
-        }
-        class Symptom {
-            +String symptom
-            +String diagnosis
-            +ObjectId user
-        }
+```mermaid
+classDiagram
+    class User {
+        +String username
+        +String passwordHash
+        +List~ObjectId~ diagnosis
+    }
 
-        Symptom --> User : user
-        User --> Symptom : symptom
-    ```
+    class Diagnosis {
+        +List~DiagnosisData~ diagnosis
+        +ObjectId user
+    }
+
+    class DiagnosisData {
+        +String symptom
+        +TopResult topResult
+        +OtherResults includedResults
+        +OtherResults excludedResults
+    }
+
+    class TopResult {
+        +String label
+        +Number score
+        +String title
+        +String detail
+        +String url
+    }
+
+    class OtherResults {
+        +List~String~ label
+        +List~Number~ score
+        +List~String~ url
+    }
+
+    User --> Diagnosis : diagnosis
+    Diagnosis --> User : user
+    Diagnosis --> DiagnosisData : diagnosis
+    DiagnosisData --> TopResult : topResult
+    DiagnosisData --> OtherResults : includedResults
+    DiagnosisData --> OtherResults : excludedResults
+
+```
 
 <hr>
 
@@ -101,11 +127,15 @@
         alt General Symptoms search
             Note over FRONTEND: <SymptomForm /> validation - PASSED
             FRONTEND->>+BACKEND: POST /api/protected/symptoms/general
-        Note over BACKEND: Sanitize and Validate User input  
-            BACKEND->>+ICD11 API: SymptomChecker Controller : GET /icd/release/11/2024-01/mms/search
-            ICD11 API-->>-BACKEND: External Server : search results {}<br>locate {'label': '', 'score': '', 'foundationUri': ''} 
-            BACKEND->>+ICD11 API: SymptomChecker Controller : GET /icd/release/11/2024-01/mms/lookup 
-            ICD11 API-->>-BACKEND: External Server : lookup results {}<br>locate {'title': '', 'definition': '', 'browserUrl': ''}
+        Note over BACKEND: Sanitize and Validate User input
+            loop Search request for each symptom  
+                BACKEND->>+ICD11 API: SymptomChecker Controller : GET /icd/release/11/2024-01/mms/search
+                ICD11 API-->>-BACKEND: External Server : multiple search results {}<br> {'label': [''], 'score': [''], 'foundationUri': ['']}
+                loop Lookup request for each foundationUri 
+                    BACKEND->>+ICD11 API: SymptomChecker Controller : GET /icd/release/11/2024-01/mms/lookup 
+                    ICD11 API-->>-BACKEND: External Server : lookup results {}<br>locate {'title': '', 'definition': '', 'browserUrl': ''}
+                end
+            end
             BACKEND-->>-FRONTEND: SymptomChecker Controller: diagnosisData {'topResult': {}, 'includedResults': {}, 'excludedResults': {}}
             par
                 BACKEND->>+DATABASE: SymptomChecker Controller : encrypt and store symptoms, diagnosisData
@@ -116,11 +146,13 @@
         else Specific Symptoms search
             Note over FRONTEND: <SymptomForm /> validation - PASSED
             FRONTEND->>+BACKEND: POST /api/protected/symptoms/specific
-        Note over BACKEND: Sanitize and Validate User input  
-            BACKEND->>+ICD11 API: SymptomChecker Controller : GET /icd/release/11/2024-01/mms/autocode
-            ICD11 API-->>-BACKEND: External Server : search results {}<br>locate {'label': '', 'score': '', 'foundationUri': ''} 
-            BACKEND->>+ICD11 API: SymptomChecker Controller : GET /icd/release/11/2024-01/mms/lookup 
-            ICD11 API-->>-BACKEND: External Server : lookup results {}<br>locate {'title': '', 'definition': '', 'browserUrl': ''}
+        Note over BACKEND: Sanitize and Validate User input 
+            loop GET request for each symptom   
+                BACKEND->>+ICD11 API: SymptomChecker Controller : GET /icd/release/11/2024-01/mms/autocode
+                ICD11 API-->>-BACKEND: External Server : single search result {}<br>locate {'label': '', 'score': '', 'foundationUri': ''} 
+                BACKEND->>+ICD11 API: SymptomChecker Controller : GET /icd/release/11/2024-01/mms/lookup 
+                ICD11 API-->>-BACKEND: External Server : lookup results {}<br>locate {'title': '', 'definition': '', 'browserUrl': ''}
+            end
             BACKEND-->>-FRONTEND: SymptomChecker Controller: diagnosisData {'topResult': {}, 'includedResults': {}, 'excludedResults': {}}
             par
                 BACKEND->>+DATABASE: SymptomChecker Controller : encrypt and store symptoms, diagnosisData

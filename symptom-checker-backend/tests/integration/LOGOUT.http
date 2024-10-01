@@ -1,0 +1,5 @@
+
+####
+POST http://localhost:3003/public/auth/logout HTTP/1.1
+
+#### 

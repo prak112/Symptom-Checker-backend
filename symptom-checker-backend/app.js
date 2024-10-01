@@ -2,21 +2,21 @@
 const config = require('./utils/config')
 const express = require('express')
 const app = express()
+const cors = require('cors')  // cross-origin resource sharing
+// authentication setup
 const cookieParser = require('cookie-parser')
 app.use(cookieParser())
-const cors = require('cors')  // cross-origin resource sharing
 const middleware = require('./utils/middleware')
-const logger = require('./utils/logger')
-const apiAuthController = require('./controllers/auth/apiAuthController')
+// routers
+const icdAuthController = require('./controllers/auth/api/icdAuthController')
 const userAuthRouter = require('./routes/userAuthRouter')
 const symptomCheckerRouter = require('./routes/symptomCheckerRouter')
+const userDataRouter = require('./routes/userDataRouter')
+// utilities
+const logger = require('./utils/logger')
 
 
 /**TO DO
- * FEAT-User Auth : Setup 'Login as Guest' or store guest users' input as 'guest#random-number'
- * FEAT-Symptoms : Setup MongoDB collection and data storage
- * FEAT-encrypt symptom data, user data with local DB_SECRET key for storage
- * FEAT-Refine search results : to address all symptoms, to remove < 0 score results
  * TEST-Unit tests for user auth, api auth, symptomChecker requests
 **/
 
@@ -33,9 +33,9 @@ mongoose
 
 // Load Middleware
 // ICD API authentication middeware
-app.use(apiAuthController.authenticate)
+app.use(icdAuthController.authenticate)
 
-// CORS-accepts frontend communication from different origin
+// CORS - add frontend origin and methods for secure communication
 app.use(cors({
     origin: 'http://localhost:5173/',
     methods: ['GET', 'POST', 'PUT', 'DELETE']
@@ -44,12 +44,14 @@ app.use(cors({
 app.use(express.json()) 
 app.use(middleware.requestLogger)
 
+// authentication middleware
+app.use(middleware.tokenExtractor)
+//app.use(middleware.userExtractor)
+
 // Route requests
 app.use('/public/auth', userAuthRouter)
 app.use('/api/protected/symptoms', symptomCheckerRouter)
-
-app.use(middleware.tokenExtractor)
-app.use(middleware.userExtractor)
+app.use('/api/protected/users', userDataRouter)
 
 // Error handlers
 app.use(middleware.unknownEndpoint)

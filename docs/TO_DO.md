@@ -1,10 +1,11 @@
 # Features :
-- [Grouped Search Results](#grouped-search-results)
-- [User Histrory]()
-- [End-to-End Encryption](#end-to-end-encryption)
-- [Geolocation APIs](#geolocation-apis)
-- [Triage System](#triage-system)
-- [Intelligent I/O Simplification](#intelligent-io-simplification)
+- [X] [Grouped Search Results](#grouped-search-results)
+- [X] [User Histrory](#user-history)
+- [X] [User Logout Cleanup](#user-logout-cleanup)
+- [ ] [End-to-End Encryption](#end-to-end-encryption)
+- [ ] [Geolocation APIs](#geolocation-apis)
+- [ ] [Triage System](#triage-system)
+- [ ] [Intelligent I/O Simplification](#intelligent-io-simplification)
 
 <hr>
 <hr>
@@ -18,9 +19,21 @@
 
 ## User History
 - GitHub Issue [#12](https://github.com/prak112/Symptom-Checker-backend/issues/12)
+- Retrieve user data from database by :
+    - Setup endpoint for user history
+    - Setup controller in database directory
 
 <hr>
 <br>
+
+## User Logout Cleanup
+- Things To Do : 
+    - *Invalidate the Session*: If the backend uses sessions, the session associated with the user should be invalidated.
+    - *Revoke Tokens*: If the backend uses tokens (e.g., JWT), the token should be revoked or blacklisted to prevent further use.
+    - *Clear Cookies*: If authentication information is stored in cookies, the backend should clear these cookies.
+    - *Audit Logging*: Optionally, log the logout event for auditing and security purposes.
+
+These actions ensure that the user's session is properly terminated and that any authentication tokens are no longer valid.
 
 ## End-to-End Encryption
 - GitHub Issue [#4](https://github.com/prak112/Symptom-Checker-backend/issues/4)

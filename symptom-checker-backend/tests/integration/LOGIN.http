@@ -1,6 +1,17 @@
 ####
-#@valid login 1
-POST http://localhost:3003/public/login HTTP/1.1
+#@valid user login bulbasaur
+
+POST http://localhost:3003/public/auth/login HTTP/1.1
+content-type: application/json
+
+{
+    "username": "bulbasaur",
+    "password": "vine123#"
+} 
+
+####
+#@valid user login uno
+POST http://localhost:3003/public/auth/login HTTP/1.1
 content-type: application/json
 
 {
@@ -9,9 +20,9 @@ content-type: application/json
 }
 
 ####
-#@valid login 2
+#@valid user login deus
 
-POST http://localhost:3003/public/login HTTP/1.1
+POST http://localhost:3003/public/auth/login HTTP/1.1
 content-type: application/json
 
 {
@@ -20,9 +31,14 @@ content-type: application/json
 }
 
 ####
+#@valid GUEST login
+
+POST http://localhost:3003/public/auth/guest HTTP/1.1
+
+####
 #@invalid login
 
-POST http://localhost:3003/public/login HTTP/1.1
+POST http://localhost:3003/public/auth/login HTTP/1.1
 content-type: application/json
 
 {

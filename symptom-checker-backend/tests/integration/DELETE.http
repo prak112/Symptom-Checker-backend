@@ -1,0 +1,11 @@
+####
+#@ valid diagnosis delete
+
+DELETE http://localhost:3003/api/protected/users/history/{diagnosisId}
+Content-Type: application/json
+
+{
+    "diagnosisId": "66eabf005b838b2bbaa5a46b"
+}
+
+####
