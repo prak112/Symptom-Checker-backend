@@ -35,10 +35,11 @@ mongoose
 // ICD API authentication middeware
 app.use(icdAuthController.authenticate)
 
-// CORS - add frontend origin and methods for secure communication
+// CORS - config frontend (web, mobile) for secure communication
 app.use(cors({
-    origin: 'http://localhost:5173/',
-    methods: ['GET', 'POST', 'PUT', 'DELETE']
+    origin: ['http://localhost:5173/','http://localhost:8081'],
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
 }))
 // json-parser for request body   
 app.use(express.json()) 
