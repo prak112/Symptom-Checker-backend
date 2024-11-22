@@ -35,9 +35,9 @@ mongoose
 // ICD API authentication middeware
 app.use(icdAuthController.authenticate)
 
-// CORS - config frontend (web, mobile) for secure communication
+// CORS - config frontends for secure communication
 app.use(cors({
-    origin: ['http://localhost:5173/','http://localhost:8081'],
+    origin: [config.WEB_FRONTEND, config.MOBILE_FRONTEND],
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
 }))
@@ -47,7 +47,6 @@ app.use(middleware.requestLogger)
 
 // authentication middleware
 app.use(middleware.tokenExtractor)
-//app.use(middleware.userExtractor)
 
 // Route requests
 app.use('/public/auth', userAuthRouter)
