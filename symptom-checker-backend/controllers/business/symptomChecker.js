@@ -4,7 +4,7 @@ const searchHelper = require('../utils/lookupSearchData')
 const dataProcessor = require('../utils/refineQueryResults')
 const symptomsProcessor = require('../utils/searchSymptoms')
 // database controller
-const dataController = require('../../database/controllers/data')
+const dataController = require('../../database/controllers/userData')
 
 
 // POST - 'General' search result from symptoms list
@@ -43,74 +43,6 @@ exports.getGeneralDiagnosis = async(request, response, next) => {
                 })
             }
         }
-
-        // for (let symptom of symptoms) {
-
-            // // intialize arrays for diagnosis data
-            // let labelsArray = []
-            // let scoresArray = []
-            // let foundationUrisArray = []
-            // // General search - /icd/release/11/2024-01/mms/search
-            // const searchParams = {
-            //     q: symptom,
-            //     subtreeFilterUsesFoundationDescendants: false,
-            //     includeKeywordResult: true,
-            //     useFlexisearch: true,
-            //     flatResults: true,
-            //     highlightingEnabled: true,
-            //     medicalCodingMode: true 
-            // }
-            
-            // // construct query string for URI
-            // const searchEndpoint = requestHelper.buildRequestEndpoint(searchParams, searchUrl);
-            // const searchResponse = await fetch(searchEndpoint, requestOptions)
-            // console.log(`\nSEARCH ${requestOptions.method} ${searchUrl} : ${searchResponse.status}`)
-    
-            // // extract data from search results
-            // const searchData = await searchResponse.json()
-    
-            // // General search results - /icd/release/11/{releasId}/{linearizationName}/search
-            // // Data crawl map : destinationEntities--> MatchingPVs--> label, score, foundationUri
-            // for(let entity of searchData.destinationEntities) {
-            //     if(entity.matchingPVs && Array.isArray(entity.matchingPVs)) {
-            //         for(let pv of entity.matchingPVs) {
-            //             // avoid duplicate data in searchQueryOutput
-            //             if(foundationUrisArray.includes(pv.foundationUri)) {
-            //                 break
-            //             }
-            //             else {
-            //                 labelsArray.push(pv.label);
-            //                 scoresArray.push(pv.score);
-            //                 foundationUrisArray.push(pv.foundationUri);
-            //                 //console.log('URI #',uriCount,' : ', pv.foundationUri);                        
-            //             }
-            //         }
-            //     }
-            // }
-            // console.log(`SEARCH data AFTER filtering Duplicates (foundationUri) :
-            //     LABELS: ${labelsArray.length}
-            //     SCORES: ${scoresArray.length}
-            // `)
-    
-            // // Handle ICD API Buggy URI (Debug_Log issue 2)
-            // const cleanedUrisArray = dataProcessor.sanitizeUrisArray(foundationUrisArray)
-    
-            // // pack search data for LookUp query
-            // const searchQueryOutput = {
-            //     label: labelsArray,
-            //     score: scoresArray,
-            //     foundationURI: cleanedUrisArray,
-            // }
-    
-            // // lookup foundationURI
-            // const lookUpRequestOptions = await requestHelper.buildRequestOptions(request, 'GET');
-            // const diagnosisData = await searchHelper.generateDiagnosisData(lookUpRequestOptions, searchQueryOutput);
-            // pack diagnosis for user-provided symptom
-            // diagnosisDataArray.push({
-            //     symptom: symptom,
-            //     ...diagnosisData
-            // })
-        // }
 
         // store registered/guest user data
         console.log('\nStoring user data...')
@@ -169,51 +101,6 @@ exports.getSpecificDiagnosis = async(request, response) => {
                 })
             }
         }
-
-        // for (let symptom of symptoms) {
-        //     // intialize arrays for diagnosis data
-        //     let labelsArray = []
-        //     let scoresArray = []
-        //     let foundationUrisArray = []
-
-        //     // Specific search result - /icd/release/11/2024-01/mms/autocode
-        //     const searchParams = {
-        //         searchText: symptom
-        //     }
-            
-        //     // construct query string for URI
-        //     const searchEndpoint = requestHelper.buildRequestEndpoint(searchParams, searchUrl);
-        //     const searchResponse = await fetch(searchEndpoint, requestOptions) 
-        //     console.log(`\nStatus ${requestOptions.method} ${searchUrl} : ${searchResponse.status}`)
-    
-        //     // Extract data and display in user-readable and understandable format
-        //     // extract data from search results
-        //     const searchData = await searchResponse.json()
-        //     // console.log('Auto Search Data : \n', searchData)
-    
-        //     // Specific search result - /icd/release/11/2024-01/mms/autocode
-        //     labelsArray.push(searchData.matchingText)
-        //     foundationUrisArray.push(searchData.foundationURI)
-        //     scoresArray.push(searchData.matchScore)
-    
-        //     // Handle ICD API Buggy URI (Debug_Log issue 2)
-        //     const cleanedUrisArray = dataProcessor.sanitizeUrisArray(foundationUrisArray)
-            
-        //     const searchQueryOutput = {
-        //         label: labelsArray,
-        //         score: scoresArray,
-        //         foundationURI: cleanedUrisArray,
-        //     };
-    
-        //     // lookup foundationURI
-        //     const lookUpRequestOptions = await requestHelper.buildRequestOptions(request, 'GET');
-        //     const diagnosisData = await searchHelper.generateDiagnosisData(lookUpRequestOptions, searchQueryOutput);
-            
-        //     diagnosisDataArray.push({
-        //         symptom: symptom,
-        //         ...diagnosisData
-        //     })
-        // }
 
         // store registered/guest user data
         console.log('\nStoring user data...')
