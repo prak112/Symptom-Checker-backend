@@ -7,6 +7,7 @@ const DB_SECRET = process.env.DB_SECRET
 const OLD_DB_SECRET = process.env.OLD_DB_SECRET
 const WEB_FRONTEND = process.env.WEB_FRONTEND
 const MOBILE_FRONTEND = process.env.MOBILE_FRONTEND
+const ADMIN_FRONTEND = process.env.ADMIN_FRONTEND
 
 module.exports = { 
     CLIENT_ID, 
@@ -18,4 +19,5 @@ module.exports = {
     OLD_DB_SECRET,
     WEB_FRONTEND,
     MOBILE_FRONTEND,
+    ADMIN_FRONTEND,
  }
