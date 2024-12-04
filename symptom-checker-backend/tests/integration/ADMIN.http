@@ -1,0 +1,28 @@
+####
+#@valid admin SIGN UP
+
+POST http://localhost:3003/public/auth/signup HTTP/1.1
+content-type: application/json
+
+{
+    "username": "admin",
+    "password": "34figum!PI£awsF&23"
+}
+
+####
+#@valid admin LOGIN
+
+POST http://localhost:3003/public/auth/login HTTP/1.1
+content-type: application/json
+
+{
+    "username": "admin",
+    "password": "34figum!PI£awsF&23"
+}
+
+####
+#@valid GET users
+
+GET http://localhost:3003/api/protected/admin/users
+
+####
