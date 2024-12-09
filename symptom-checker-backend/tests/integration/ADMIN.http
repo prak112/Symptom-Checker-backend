@@ -26,3 +26,14 @@ content-type: application/json
 GET http://localhost:3003/api/protected/admin/users
 
 ####
+#@valid GET diagnosis
+
+GET http://localhost:3003/api/protected/admin/diagnosis
+
+
+####
+#@valid admin LOGOUT
+
+POST http://localhost:3003/public/auth/logout HTTP/1.1
+
+####
