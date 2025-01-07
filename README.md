@@ -3,12 +3,13 @@
 - Shared Backend is responsible for handling :
   - ICD API authentication for symptoms-related diagnosis data,
   - connection to MongoDB,
-  - authentication and authorization of users,
-  - authentication of user requests,
+  - authentication and authorization of users and admins,
+  - authentication of user requests and admin requests,
   - communication with ICD API for user's symptoms-related diagnosis data,
-  - cleaning and transformation of JSON response from ICD API for relevancy to database schema,
+  - communication with MongoDB to retrieve specific data for admin,
+  - cleaning and transformation of JSON response from ICD API for relevancy to MongoDB (`mongoose` ODM) schema,
   - encryption and saving the processed diagnosis data in MongoDB,
-  - encryption and sending the processed diagnosis data as JSON response to Client-side.
+  - encryption and sending the processed diagnosis data as JSON response to Client-side (Web, Mobile or Admin),
  
 - Architected and developed using `Node.js`, `Express.js`, and MongoDB.
 - Employed a layered architecture with clear separation of concerns for maintainability and scalability.
