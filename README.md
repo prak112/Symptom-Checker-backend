@@ -3,7 +3,7 @@
 - Shared Backend is responsible for handling :
   - ICD API authentication for symptoms-related diagnosis data,
   - connection to MongoDB,
-  - authentication of users,
+  - authentication and authorization of users,
   - authentication of user requests,
   - communication with ICD API for user's symptoms-related diagnosis data,
   - cleaning and transformation of JSON response from ICD API for relevancy to database schema,
