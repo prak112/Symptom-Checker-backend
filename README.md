@@ -6,7 +6,7 @@
   - authentication of users,
   - authentication of user requests,
   - communication with ICD API for user's symptoms-related diagnosis data,
-  - cleaning and transformation of JSON response from ICD API relevant to database schema,
+  - cleaning and transformation of JSON response from ICD API for relevancy to database schema,
   - encryption and saving the processed diagnosis data in MongoDB,
   - encryption and sending the processed diagnosis data as JSON response to Client-side.
  
