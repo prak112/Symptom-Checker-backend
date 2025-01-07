@@ -2,7 +2,7 @@
 - This repository serves as a Shared Backend for Symptom Checker application.
 - Server-side application which handles the ICD API authentication, access and data processing and generating relevant output for the symptoms passed down from the frontend API (`axios`).
 - Architected and developed using `Node.js`, `Express.js`, and MongoDB.
-- Employed a layered architecture with clear separation of concerns for maintainability and extensibility.
+- Employed a layered architecture with clear separation of concerns for maintainability and scalability.
 
 - Prototype, plan and implementation of the Symptom Checker application are defined in the [prototype README](https://github.com/prak112/ICD11-SymptomChecker#oveview)
 - Tools and Technologies used : 
