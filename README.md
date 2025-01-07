@@ -1,6 +1,6 @@
 # Overview
 - This repository serves as a Shared Backend for Symptom Checker application.
-- Server-side application which handles the ICD API authentication, access and data processing and generating relevant output for the symptoms passed down from the frontend API (`axios`).
+- Shared Backend is responsible for ICD API authentication, data access, processing, generating relevant output for symptom data received from the frontend via `axios`.
 - Architected and developed using `Node.js`, `Express.js`, and MongoDB.
 - Employed a layered architecture with clear separation of concerns for maintainability and scalability.
 
