@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken')
-const config = require('./config')
+const secrets = require('./secrets')
 
 /**
  * Generates an authentication token(JWT) for a registered user.
@@ -17,7 +17,7 @@ function generateAuthToken(registeredUser) {
     // generate 2 hours valid JWT 
     const token = jwt.sign(
         userToAuthenticate,
-        config.USER_SECRET,
+        secrets.user_secret,
         {
             expiresIn: 2 * 60 * 60 // seconds
         }
