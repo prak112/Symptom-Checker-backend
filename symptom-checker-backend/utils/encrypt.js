@@ -1,26 +1,46 @@
 const crypto = require('crypto');
 const logger = require('./logger')
-const Symptom = require('../models/symptom')
+const Symptom = require('../database/models/symptom')
 const secrets = require('./secrets')
 
 
-const secret = secrets.secret
 const algorithm = secrets.algorithm
 const key = secrets.key
 const iv = secrets.iv
 
-function encryptData() {
+function encryptData(record) {
 	const cipher = crypto.createCipheriv(algorithm, key, iv);
-	let encrypted = cipher.update(secret, 'utf8', 'hex');
+	let encrypted = cipher.update(record, 'utf8', 'hex');
 	encrypted += cipher.final('hex');
 	return encrypted;
 }
 
-function decryptData(encryptedSecret) {
+function decryptData(encryptedRecord) {
 	const decipher = crypto.createDecipheriv(algorithm, key, iv);
-	let decrypted = decipher.update(encryptedSecret, 'hex', 'utf8');
+	let decrypted = decipher.update(encryptedRecord, 'hex', 'utf8');
 	decrypted += decipher.final('utf8');
 	return decrypted;
+}
+
+
+// TODO - Verify Recursive function to account for every field in fieldsToEncrypt list
+
+
+/**
+ * Recursively encrypts or decrypts specified fields in an object.
+ * 
+ * @param {Object} obj - The object to process.
+ * @param {Array} fieldsToEncrypt - The fields to encrypt/decrypt.
+ * @param {Function} processFunc - The function to apply (encrypt/decrypt).
+ */
+function processFields(obj, fieldsToEncrypt, processFunc) {
+    for (const key in obj) {
+        if (fieldsToEncrypt.includes(key) && typeof obj[key] === 'string') {
+            obj[key] = processFunc(obj[key]);
+        } else if (typeof obj[key] === 'object' && obj[key] !== null) {
+            processFields(obj[key], fieldsToEncrypt, processFunc);
+        }
+    }
 }
 
 /**
@@ -35,22 +55,22 @@ function decryptData(encryptedSecret) {
  * @throws logs error message if error occurs during re-encryption process.
  */
 async function reEncryptData() {
-	const records = await Symptom.find().toArray();
     try {
+        const records = await Symptom.find();
+        const fieldsToEncrypt = ['symptom', 'analysis', 'label', 'score', 'title', 'detail', 'url'];
+
         for (const record of records) {
-            for(const diagnosis of record.diagnosis){
-                const decryptedData = decryptData(diagnosis.symptom);
-                const reEncryptedData = encryptData(decryptedData);
-                diagnosis.symptom = reEncryptedData
-            }
-            await record.save()
+            processFields(record.toObject(), fieldsToEncrypt, decryptData);
+            processFields(record.toObject(), fieldsToEncrypt, encryptData);
+            await record.save();
         }
         logger.info('Data re-encrypted successfully');
-    } 
-    catch (error) {
+    } catch (error) {
         logger.error('ERROR re-encrypting data:', error);
     }
 }
+
+
 
 module.exports = { decryptData, encryptData, reEncryptData }
 
