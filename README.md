@@ -40,6 +40,7 @@ classDiagram
 
     class DiagnosisData {
         +String symptom
+        +String analysis
         +TopResult topResult
         +OtherResults includedResults
         +OtherResults excludedResults
