@@ -7,19 +7,24 @@ const symptomsProcessor = require('../utils/searchSymptoms')
 const dataController = require('../../database/controllers/userData')
 
 
-// POST - 'General' search result from symptoms list
+/**
+ * Request type - POST
+ * 'General' search result from symptoms list
+ * Example symptoms - ['knee joint pain', 'spinal cord pain', 'shoulder pain', 'cough', 'fever'] 
+ * @param {*} request 
+ * @param {*} response 
+ * @param {*} next 
+ */
 exports.getGeneralDiagnosis = async(request, response, next) => {
     try {
-        // retrieve symptoms
-        // sample - ['knee joint pain', 'spinal cord pain', 'shoulder pain', 'cough', 'fever']
+        // TODO - Decrypt frontend request parameters, i.e., symptoms, analysis
         const symptoms =  request.body.symptoms
         const analysisType = request.body.analysis
         console.log('Request Body : ', request.body)
         console.log('SEARCH Query for : ', symptoms);
         console.log('Analysis type : ', analysisType)
         
-        // setup API auth for search query
-        // const requestOptions = await requestHelper.buildRequestOptions(request, 'POST');
+        // ICD API search endpoint
         const searchUrl = 'https://id.who.int/icd/release/11/2024-01/mms/search'
 
         const diagnosisDataArray = []
@@ -27,6 +32,8 @@ exports.getGeneralDiagnosis = async(request, response, next) => {
         if (analysisType.includes("panel")) {
             const symptomString = symptoms.toString()
             const diagnosisData = await symptomsProcessor.generateGeneralDiagnosis(request, searchUrl, symptomString)
+            
+            // TODO - Encrypt processed data, i.e., diagnosisData
             diagnosisDataArray.push({
                 symptom: symptomString,
                 analysis: analysisType,
@@ -36,6 +43,8 @@ exports.getGeneralDiagnosis = async(request, response, next) => {
         if (analysisType.includes("assessment")) {
             for (let symptom of symptoms) {
                 const diagnosisData = await symptomsProcessor.generateGeneralDiagnosis(request, searchUrl, symptom)
+
+            // TODO - Encrypt processed data, i.e., diagnosisData
                 diagnosisDataArray.push({
                     symptom: symptom,
                     analysis: analysisType,
@@ -47,6 +56,8 @@ exports.getGeneralDiagnosis = async(request, response, next) => {
         // store registered/guest user data
         console.log('\nStoring user data...')
         const user = request.user
+        
+        // TODO - Pass encrypted diagnosisData to database
         const dbResponse = dataController.manageDatabase(user, diagnosisDataArray)
         if (dbResponse) {
             response
@@ -64,20 +75,23 @@ exports.getGeneralDiagnosis = async(request, response, next) => {
     }
 }
 
-// POST - 'Specific' search result from symptoms list
-exports.getSpecificDiagnosis = async(request, response) => {
+/**
+ * Request type - POST
+ * 'Specific' search result from symptoms list
+ * Example symptoms - ['knee joint pain', 'spinal cord pain', 'shoulder pain', 'cough', 'fever']
+ * @param {*} request 
+ * @param {*} response 
+ */
+exports.getSpecificDiagnosis = async(request, response, next) => {
     try {
-        // retrieve symptoms
-        // sample - ['knee joint pain', 'spinal cord pain', 'shoulder pain', 'cough', 'fever']
+        // TODO - Decrypt frontend request parameters, i.e., symptoms, analysis
         const symptoms =  request.body.symptoms
         const analysisType = request.body.analysis
         console.log('Request Body : ', request.body)
         console.log('\nSEARCH Query for : ', symptoms);
         console.log('Analysis type : ', analysisType)
 
-        // access middleware to authenticate access
-        // const requestOptions = await requestHelper.buildRequestOptions(request, 'GET');
-        // API search endpoint
+        // ICD API search endpoint
         const searchUrl = 'https://id.who.int/icd/release/11/2024-01/mms/autocode'
 
         const diagnosisDataArray = []
@@ -85,6 +99,8 @@ exports.getSpecificDiagnosis = async(request, response) => {
         if (analysisType.includes("panel")) {
             const symptomString = symptoms.toString()
             const diagnosisData = await symptomsProcessor.generateSpecificDiagnosis(request, searchUrl, symptomString)
+
+            // TODO - Encrypt processed data, i.e., diagnosisData
             diagnosisDataArray.push({
                 symptom: symptomString,
                 analysis: analysisType,
@@ -94,6 +110,8 @@ exports.getSpecificDiagnosis = async(request, response) => {
         if (analysisType.includes("assessment")) {
             for (let symptom of symptoms) {
                 const diagnosisData = await symptomsProcessor.generateSpecificDiagnosis(request, searchUrl, symptom)
+
+            // TODO - Encrypt processed data, i.e., diagnosisData
                 diagnosisDataArray.push({
                     symptom: symptom,
                     analysis: analysisType,
@@ -105,18 +123,20 @@ exports.getSpecificDiagnosis = async(request, response) => {
         // store registered/guest user data
         console.log('\nStoring user data...')
         const user = request.user
+    
+        // TODO - Pass encrypted diagnosisData to database and frontend
         const dbResponse = dataController.manageDatabase(user, diagnosisDataArray)
-        if (dbResponse) {
-            response
-                .status(200)
-                .json(diagnosisDataArray)
-        } else {
-            response
-                .status(500)
-                .json({ error: 'Failed to store data!' })
+        if (!dbResponse) {
+            return response
+            .status(500)
+            .json({ error: 'Failed to store data!' })
         }
+        return response
+            .status(200)
+            .json(diagnosisDataArray)
     } 
     catch(error) {
         console.error('ERROR during Specific search : ', error)
+        next(error)
     }
 }
