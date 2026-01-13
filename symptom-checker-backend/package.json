@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "node --env-file=.env index.js && node index.js",
+    "start": "node index.js",
     "test": "jest"
   },
   "repository": {
