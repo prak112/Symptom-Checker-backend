@@ -1,8 +1,8 @@
 // Intial setup
-const config = require('./utils/config')
 const express = require('express')
 const app = express()
 const cors = require('cors')  // cross-origin resource sharing
+const config = require('./utils/config')
 // authentication setup
 const cookieParser = require('cookie-parser')
 app.use(cookieParser())
