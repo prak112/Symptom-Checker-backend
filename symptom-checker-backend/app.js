@@ -45,7 +45,7 @@ app.use(cors({
         config.ADMIN_FRONTEND
     ],
     credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
 }))
 // json-parser for request body   
 app.use(express.json()) 
