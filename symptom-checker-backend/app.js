@@ -1,7 +1,7 @@
 // Intial setup
 const express = require('express')
 const app = express()
-const cors = require('cors')  // cross-origin resource sharing
+// const cors = require('cors')  // cross-origin resource sharing
 const config = require('./utils/config')
 // authentication setup
 const cookieParser = require('cookie-parser')
@@ -37,16 +37,16 @@ mongoose
 app.use(icdAuthController.authenticate)
 
 // CORS - config frontends for secure communication
-app.use(cors({
-    origin: [
-        config.WEB_FRONTEND_DEV,
-        config.WEB_FRONTEND_PROD, 
-        config.MOBILE_FRONTEND, 
-        config.ADMIN_FRONTEND
-    ],
-    credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-}))
+// app.use(cors({
+//     origin: [
+//         config.WEB_FRONTEND_DEV,
+//         config.WEB_FRONTEND_PROD, 
+//         config.MOBILE_FRONTEND, 
+//         config.ADMIN_FRONTEND
+//     ],
+//     credentials: true,
+//     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+// }))
 // json-parser for request body   
 app.use(express.json()) 
 app.use(middleware.requestLogger)
