@@ -39,7 +39,8 @@ app.use(icdAuthController.authenticate)
 // CORS - config frontends for secure communication
 app.use(cors({
     origin: [
-        config.WEB_FRONTEND, 
+        config.WEB_FRONTEND_DEV,
+        config.WEB_FRONTEND_PROD, 
         config.MOBILE_FRONTEND, 
         config.ADMIN_FRONTEND
     ],
