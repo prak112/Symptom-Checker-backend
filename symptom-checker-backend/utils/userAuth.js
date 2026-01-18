@@ -34,8 +34,8 @@ function generateAuthToken(registeredUser) {
  */
 function setAuthToken(response, token){
     response.cookie('auth_token', token, {
-        httpOnly: true,
-        secure: false, // true if https
+        httpOnly: false,
+        secure: true, // true if https(prod), false if http(dev)
         maxAge: 2 * 60 * 60 * 1000, // match token expiresIn (milliseconds)
         sameSite: 'strict'  // mitigate CSRF attacks
     })
