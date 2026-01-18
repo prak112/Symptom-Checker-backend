@@ -8,6 +8,7 @@
 - [4 - `diagnosisData` Schema complication](#4---diagnosisdata-schema-complication)
 - [5 - Database Controller and Middleware Setup](#5---database-controller-and-middleware-setup)
 
+
 <br>
 <hr>
 <hr>
@@ -234,6 +235,54 @@
     ...
     ```
 
+[Back to Top](#issues-solutions)
+
+
 <hr>
 <hr>
 <br>
+
+# 6 - Deployment : JWT Verification Error
+- *MAJOR Issue*
+    - After authentication is cleared, diagnosis endpoint calls throw JWT error.
+    - Probable cause lies in Frontend of not attaching JWT to the requests.
+    - Auth endpoint is render-backend-url/public/auth and protected api endpoint is render-backend-url/api/protected 
+    - Backend Error: 
+        ```
+        ERROR during User identification :  JsonWebTokenError: jwt must be provided at module.exports [as verify] (/opt/render/project/src/symptom-checker-backend/node_modules/jsonwebtoken/verify.js:60:17)
+        ```
+    - Frontend Error:
+        ````
+        Access to XMLHttpRequest at 'https://symptom-checker-backend-xkxy.onrender.com/public/auth/guest' from origin 'http://localhost:4173' has been blocked by CORS policy: The 'Access-Control-Allow-Origin' header contains multiple values '*, *, *, *, *', but only one is allowed.
+        ````
+        ````
+        POST https://symptom-checker-backend-xkxy.onrender.com/public/auth/guest net::ERR_FAILED 508 (Loop Detected)
+        ````
+
+    - Due to frontend service handler setting - `axios.defaults.withCredentials = true`
+    - Nginx is now forwarding those cookies to backend.
+    - Backend has CORS + credentials enabled, which forces the browser to retry the request with stricter rules.
+    - Meanwhile, Nginx is also adding its own CORS headers.
+    - This creates a loop:
+        - Browser sends request with cookies
+        - Nginx adds CORS headers
+        - Backend adds different CORS headers
+        - Browser rejects → retries
+        - Nginx proxies again
+        - Backend responds again
+        - Loop continues → 508
+    - **This is a classic “double CORS layer + credentials” loop.**
+
+    ### Summary
+    - 508 = redirect loop
+    - Loop caused by double CORS + credentials
+    - Fix = remove backend CORS, keep Nginx CORS only
+    - Backend should not send any CORS headers at all
+
+[Back to Top](#issues-solutions)
+
+<hr>
+<hr>
+<br>
+
+
